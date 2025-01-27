@@ -52,5 +52,3 @@ workflows:
             branches:
               only:
                 - main
-              only:
-                - main
