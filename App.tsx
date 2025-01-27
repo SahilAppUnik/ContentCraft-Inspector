@@ -12,8 +12,7 @@ import {
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { AnalysisMetrics } from './types/analysis';
-import { Theme, ThemeColors } from './types/theme';
-import TipsPanel from './components/TipsPanel';
+import { Theme } from './types/theme';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -96,15 +95,6 @@ const AnalysisPanel = () => {
             variant: 'primary'
           })}
         </div>
-      )}
-      {metrics && (
-        <TipsPanel
-          wordCount={metrics.wordCount}
-          hashtagCount={metrics.hashtagCount}
-          emojiCount={metrics.emojiCount}
-          headerCount={metrics.headerCount}
-          theme={theme}
-        />
       )}
     </motion.div>
   );
