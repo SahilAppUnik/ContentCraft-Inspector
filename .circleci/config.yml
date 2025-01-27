@@ -14,18 +14,16 @@ jobs:
           name: Build the project
           command: npm run build
       - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
+          name: Save Build Artifacts
+          command: mkdir -p ~/artifacts && cp -R build ~/artifacts
+      - persist_to_workspace:
+          root: ~/artifacts
+          paths:
+            - .
 
   deploy:
     docker:
-      - image: circleci/node:18.16.0
+      - image: cimg/node:18.16.0
     steps:
       - checkout
       - run:
@@ -33,7 +31,7 @@ jobs:
           command: npm install netlify-cli
       - run:
           name: Deploy to Netlify
-          command: netlify deploy --prod --dir=build
+          command: netlify deploy --prod --dir=/workspace/artifacts/build
           environment:
             NETLIFY_AUTH_TOKEN: $NETLIFY_AUTH_TOKEN
             NETLIFY_SITE_ID: $NETLIFY_SITE_ID
@@ -52,5 +50,7 @@ workflows:
             - build-node
           filters:
             branches:
+              only:
+                - main
               only:
                 - main
