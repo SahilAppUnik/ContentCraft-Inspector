@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
 import {
   Brain,
   Zap,
@@ -17,7 +17,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const AnalysisPanel = () => {
-  const [theme, setTheme] = useState<Theme>('light');
+  // const [theme, setTheme] = useState<Theme>('light');
   const pathname = usePathname();
 
   const {
@@ -95,7 +95,7 @@ const AnalysisPanel = () => {
             variant: 'primary'
           })}
         </div>
-      )}
+      )}x
     </motion.div>
   );
 };

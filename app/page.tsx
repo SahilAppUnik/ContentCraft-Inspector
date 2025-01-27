@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ContentInput from '../components/ContentInput';
-import { ContentEditor } from '../components/ContentEditor';
+// import { ContentEditor } from '../components/ContentEditor';
 import AnalysisPanel from '../components/AnalysisPanel';
 import OutlinePanel from '../components/OutlinePanel';
 import InfoGainPanel from '../components/InfoGainPanel';
@@ -126,18 +126,25 @@ export default function Home() {
                     onAnalyze={handlePlagiarismCheck}
                     buttonText="Check Plagiarism"
                   />
-                ) : mode === 'create' ? (
-                  <ContentEditor 
-                    initialContent={createContent}
-                    onAnalyze={handleAnalyzeFromEditor}
-                  />
-                ) : (
-                  <ContentInput
-                    content={analyzeContent}
-                    setContent={setAnalyzeContent}
-                    onAnalyze={handleAnalyzeFromInput}
-                  />
-                )}
+                ):(<ContentInput
+                  content={analyzeContent}
+                  setContent={setAnalyzeContent}
+                  onAnalyze={handleAnalyzeFromInput}
+                />)
+                }
+               {/* : mode === 'create' ? (
+                <ContentEditor 
+                initialContent={createContent}
+                   onAnalyze={handleAnalyzeFromEditor}
+                   />
+                 ) : (
+                   <ContentInput
+                     content={analyzeContent}
+                     setContent={setAnalyzeContent}
+                     onAnalyze={handleAnalyzeFromInput}
+                   /> */}
+                 {/* )} */}
+   
               </motion.div>
               <motion.div
                 initial={{ x: 50, opacity: 0 }}

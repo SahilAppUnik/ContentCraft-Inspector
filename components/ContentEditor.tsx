@@ -1,204 +1,110 @@
-'use client';
+// 'use client';
 
-import { useState, useMemo, useRef, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css';
-import { Button } from './ui/button';
-import { Zap } from 'lucide-react';
-import { motion } from 'framer-motion';
-import type ReactQuill from 'react-quill';
+// import { useEffect, useRef, useState } from 'react';
+// import dynamic from 'next/dynamic';
+// import 'quill/dist/quill.snow.css';
+// import { Button } from './ui/button';
+// import { Zap } from 'lucide-react';
 
-// Dynamic import of ReactQuill with proper ref handling
-const QuillWrapper = dynamic(
-  async () => {
-    const { default: RQ } = await import('react-quill');
-    const Quill = (await import('quill')).default;
-    const Font = Quill.import('formats/font');
-    Font.whitelist = [
-      'Arial', 'TimesNewRoman', 'Helvetica', 'CourierNew',
-      'Georgia', 'TrebuchetMS', 'Verdana', 'Impact',
-      'ComicSansMS', 'Tahoma'
-    ];
-    Quill.register(Font, true);
+// // Dynamically import ReactQuill to avoid SSR issues
+// const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
-    const Component = ({ forwardedRef, ...props }: any) => <RQ ref={forwardedRef} {...props} />;
-    Component.displayName = "QuillWrapper";
-    return Component;
-  },
-  { 
-    ssr: false,
-    loading: () => <p>Loading editor...</p>
-  }
-);
+// interface ContentEditorProps {
+//   initialContent?: string;
+//   onAnalyze: (content: string) => void;
+// }
 
+// export function ContentEditor({ initialContent = '', onAnalyze }: ContentEditorProps) {
+//   const [content, setContent] = useState(initialContent);
+//   const [charCount, setCharCount] = useState(0);
+//   const [wordCount, setWordCount] = useState(0);
 
-// Custom font list with display names
-const fontFamilyList = [
-  'Arial',
-  'TimesNewRoman',
-  'Helvetica',
-  'CourierNew',
-  'Georgia',
-  'TrebuchetMS',
-  'Verdana',
-  'Impact',
-  'ComicSansMS',
-  'Tahoma'
-];
+//   // Use `useRef` for managing Quill instance
+//   const quillRef = useRef<any>(null);
 
-// Custom font size list
-const fontSizeList = ['8px', '10px', '12px', '14px', '16px', '18px', '20px', '24px', '36px', '48px', '60px', '72px'];
+//   // Update content when `initialContent` changes
+//   useEffect(() => {
+//     setContent(initialContent);
+//   }, [initialContent]);
 
-interface ContentEditorProps {
-  initialContent?: string;
-  onAnalyze: (content: string) => void;
-}
+//   // Update word and character count when content changes
+//   useEffect(() => {
+//     const plainText = content.replace(/<\/?[^>]+(>|$)/g, '').trim();
+//     setCharCount(plainText.length);
+//     setWordCount(plainText.split(/\s+/).filter(Boolean).length);
+//   }, [content]);
 
-export function ContentEditor({ initialContent = '', onAnalyze }: ContentEditorProps) {
-  const [content, setContent] = useState(initialContent);
-  const [charCount, setCharCount] = useState(0);
-  const [wordCount, setWordCount] = useState(0);
-  const quillRef = useRef<ReactQuill>(null);
+//   const handleAnalyze = () => {
+//     onAnalyze(content);
+//   };
 
-  // Update content when initialContent changes
-  useEffect(() => {
-    setContent(initialContent);
-  }, [initialContent]);
+//   // Define Quill modules and formats
+//   const formats = [
+//     'header',
+//     'font',
+//     'size',
+//     'bold',
+//     'italic',
+//     'underline',
+//     'strike',
+//     'blockquote',
+//     'list',
+//     'bullet',
+//     'indent',
+//     'link',
+//     'image',
+//     'color',
+//     'background',
+//   ];
 
-  // Update word and character count when content changes
-  useEffect(() => {
-    if (!content) {
-      setCharCount(0);
-      setWordCount(0);
-      return;
-    }
+//   const modules = {
+//     toolbar: [
+//       [{ header: '1' }, { header: '2' }, { font: [] }],
+//       [{ size: [] }],
+//       ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+//       [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+//       ['link', 'image'],
+//       [{ color: [] }, { background: [] }],
+//       ['clean'],
+//     ],
+//   };
 
-    // Remove HTML tags and get plain text
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
-    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+//   // Access the Quill editor instance when needed
+//   const getEditorInstance = () => {
+//     if (quillRef.current) {
+//       return quillRef.current.getEditor(); // Get the Quill editor instance
+//     }
+//     return null;
+//   };
 
-    setCharCount(plainText.length);
-    setWordCount(plainText.trim().split(/\s+/).filter(Boolean).length);
-  }, [content]);
-
-  // Custom handlers for links
-  const handleLink = () => {
-    if (!quillRef.current) return;
-    
-    const editor = quillRef.current.getEditor();
-    const selection = editor.getSelection();
-    
-    if (selection) {
-      const url = prompt('Enter URL:');
-      if (url) {
-        editor.format('link', url);
-      }
-    }
-  };
-
-  const modules = useMemo(() => ({
-    toolbar: {
-      container: [
-        [{ 'font': fontFamilyList }],
-        [{ 'size': fontSizeList }],
-        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'script': 'sub'}, { 'script': 'super' }],
-        ['blockquote', 'code-block'],
-        [
-          { 'list': 'ordered'},
-          { 'list': 'bullet'},
-          { 'indent': '-1'},
-          { 'indent': '+1' }
-        ],
-        [{ 'direction': 'rtl' }],
-        [{ 'align': ['', 'center', 'right', 'justify'] }],
-        ['link', 'image', 'video'],
-        ['clean']
-      ],
-      handlers: {
-        link: handleLink
-      }
-    },
-    clipboard: {
-      matchVisual: false
-    },
-    keyboard: {
-      bindings: {
-        tab: {
-          key: 9,
-          handler: function() {
-            return true;
-          }
-        }
-      }
-    }
-  }), []);
-
-  const formats = [
-    'font',
-    'size',
-    'bold', 'italic', 'underline', 'strike',
-    'color', 'background',
-    'script',
-    'header',
-    'blockquote', 'code-block',
-    'list', 'bullet', 'indent',
-    'direction', 'align',
-    'link', 'image', 'video'
-  ];
-
-  const handleContentChange = (newContent: string) => {
-    setContent(newContent);
-  };
-
-  const handleAnalyze = () => {
-    onAnalyze(content);
-  };
-
-  // Get plain text content for button disabled state
-  const getPlainText = () => {
-    if (!content) return '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
-    return tempDiv.textContent || tempDiv.innerText || '';
-  };
-
-  return (
-    <div className="h-full flex flex-col gap-6 p-6">
-      <div className="flex-1 relative">
-        <QuillWrapper
-          forwardedRef={quillRef}
-          theme="snow"
-          value={content}
-          onChange={handleContentChange}
-          modules={modules}
-          formats={formats}
-          className="h-[calc(100%-60px)] text-lg"
-          placeholder="Start writing your content..."
-        />
-      </div>
-      <div className="flex justify-between items-center">
-        <motion.div
-          className="flex space-x-8 text-lg text-muted-foreground"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <span>Characters: {charCount}</span>
-          <span>Words: {wordCount}</span>
-        </motion.div>
-        <Button
-          onClick={handleAnalyze}
-          disabled={!getPlainText().trim()}
-          className="gap-3 px-8 py-6 text-lg rounded-xl"
-          size="lg"
-        >
-          <Zap className="h-6 w-6" />
-          Analyze
-        </Button>
-      </div>
-    </div>
-  );
-}
+//   return (
+//     <div className="h-full flex flex-col gap-6 p-6">
+//       <div className="flex-1 relative border rounded-lg overflow-hidden bg-background">
+//         <ReactQuill
+//           ref={quillRef} // Attach the ref properly
+//           value={content}
+//           onChange={setContent}
+//           modules={modules}
+//           formats={formats}
+//           className="h-[calc(100%-60px)] text-lg"
+//           placeholder="Start writing your content..."
+//         />
+//       </div>
+//       <div className="flex justify-between items-center">
+//         <div className="flex space-x-8 text-lg text-muted-foreground">
+//           <span>Characters: {charCount}</span>
+//           <span>Words: {wordCount}</span>
+//         </div>
+//         <Button
+//           onClick={handleAnalyze}
+//           disabled={!content.trim()}
+//           className="gap-3 px-8 py-6 text-lg rounded-xl"
+//           size="lg"
+//         >
+//           <Zap className="h-6 w-6" />
+//           Analyze
+//         </Button>
+//       </div>
+//     </div>
+//   );
+// }
