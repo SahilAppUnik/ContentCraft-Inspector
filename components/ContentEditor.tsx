@@ -12,29 +12,25 @@ import type ReactQuill from 'react-quill';
 const QuillWrapper = dynamic(
   async () => {
     const { default: RQ } = await import('react-quill');
-    // Register custom font whitelist
     const Quill = (await import('quill')).default;
     const Font = Quill.import('formats/font');
     Font.whitelist = [
-      'Arial',
-      'TimesNewRoman',
-      'Helvetica',
-      'CourierNew',
-      'Georgia',
-      'TrebuchetMS',
-      'Verdana',
-      'Impact',
-      'ComicSansMS',
-      'Tahoma'
+      'Arial', 'TimesNewRoman', 'Helvetica', 'CourierNew',
+      'Georgia', 'TrebuchetMS', 'Verdana', 'Impact',
+      'ComicSansMS', 'Tahoma'
     ];
     Quill.register(Font, true);
-    return ({ forwardedRef, ...props }: any) => <RQ ref={forwardedRef} {...props} />;
+
+    const Component = ({ forwardedRef, ...props }: any) => <RQ ref={forwardedRef} {...props} />;
+    Component.displayName = "QuillWrapper";
+    return Component;
   },
   { 
     ssr: false,
     loading: () => <p>Loading editor...</p>
   }
 );
+
 
 // Custom font list with display names
 const fontFamilyList = [
