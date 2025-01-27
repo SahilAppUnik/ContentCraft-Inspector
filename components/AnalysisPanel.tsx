@@ -77,7 +77,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         <CardContent className="flex flex-col items-center justify-center h-full space-y-4">
           <h2 className="text-2xl font-bold">Content Analysis</h2>
           <p className="text-muted-foreground text-center max-w-md">
-            Click the "Analyze" button to get detailed insights about your content.
+            Click the &quot;Analyze&quot; button to get detailed insights about your content.
           </p>
         </CardContent>
       </Card>

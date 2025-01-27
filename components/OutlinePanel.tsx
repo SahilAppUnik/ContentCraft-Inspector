@@ -88,7 +88,7 @@ const OutlinePanel: React.FC<OutlinePanelProps> = ({
         <CardContent className="flex flex-col items-center justify-center h-full space-y-4">
           <h2 className="text-2xl font-bold">Content Outline</h2>
           <p className="text-muted-foreground text-center max-w-md">
-            Click the "Analyze" button to generate a structured outline of your content.
+          Click the &quot;Outline&quot; button to get detailed insights about your content.
           </p>
         </CardContent>
       </Card>

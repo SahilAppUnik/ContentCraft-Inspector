@@ -79,7 +79,7 @@ const RephrasedPanel: React.FC<RephrasedPanelProps> = ({
         <CardContent className="flex flex-col items-center justify-center h-full space-y-4">
           <h2 className="text-2xl font-bold">Content Rephrasing</h2>
           <p className="text-muted-foreground text-center max-w-md">
-            Click the "Analyze" button to get a rephrased version of your content.
+            Click the &quot;Rephrase&quot; button to get a rephrased version of your content.
           </p>
         </CardContent>
       </Card>

@@ -88,7 +88,7 @@ const PlagiarismPanel: React.FC<PlagiarismPanelProps> = ({
         <CardContent className="flex flex-col items-center justify-center h-full space-y-4">
           <h2 className="text-2xl font-bold">Plagiarism Check</h2>
           <p className="text-muted-foreground text-center max-w-md">
-            Click the "Check Plagiarism" button to analyze your content for potential plagiarism and get detailed insights.
+            Click the &quot;Check Plagiarism&quot; button to analyze your content for potential plagiarism and get detailed insights.
           </p>
         </CardContent>
       </Card>
