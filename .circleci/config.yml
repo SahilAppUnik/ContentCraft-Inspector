@@ -29,11 +29,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Netlify CLI
-          command: npm install -g netlify-cli
+          name: Install Netlify CLI Locally
+          command: npm install netlify-cli
       - run:
           name: Deploy to Netlify
-          command: netlify deploy --prod --dir=~/artifacts
+          command: netlify deploy --prod --dir=build
           environment:
             NETLIFY_AUTH_TOKEN: $NETLIFY_AUTH_TOKEN
             NETLIFY_SITE_ID: $NETLIFY_SITE_ID
