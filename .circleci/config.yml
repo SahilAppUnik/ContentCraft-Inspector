@@ -31,8 +31,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Netlify CLI Locally
-          command: npm install netlify-cli
+          name: Install Netlify CLI
+          command: npm install -g netlify-cli
       - run:
           name: Deploy to Netlify
           command: netlify deploy --prod --dir=./build
