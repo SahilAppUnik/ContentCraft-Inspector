@@ -16,12 +16,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - build
-            - dist
-            - public
-            - .output
             - .next
-            - .docusaurus
             - package.json
             - package-lock.json
 
@@ -35,7 +30,7 @@ jobs:
           command: npm install netlify-cli
       - run:
           name: Deploy to Netlify
-          command: npx netlify deploy --prod --dir=./build
+          command: npx netlify deploy --dir=./.next
           environment:
             NETLIFY_AUTH_TOKEN: $NETLIFY_AUTH_TOKEN
             NETLIFY_SITE_ID: $NETLIFY_SITE_ID
