@@ -1,134 +1,237 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Type, Clock, Zap } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertCircle, Type, Clock, Zap } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 interface AnalysisPanelProps {
-  content: string;
-  triggerAnalysis: boolean;
+  content: string
+  triggerAnalysis: boolean
 }
 
-const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
-  content,
-  triggerAnalysis,
-}) => {
-  const [analysis, setAnalysis] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+interface AnalysisResult {
+  contentScore: number
+  readability: number
+  tone: string
+  keyInsights: string[]
+  improvements: string[]
+}
+
+const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ content, triggerAnalysis }) => {
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
+  const [wordCount, setWordCount] = useState(0)
+  const [readingTime, setReadingTime] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const words = content.split(/\s+/).filter(Boolean)
+    setWordCount(words.length)
+    setReadingTime(Math.ceil(words.length / 150)) // Assuming 200 words per minute
+  }, [content])
 
   useEffect(() => {
     const analyzeContent = async () => {
-      if (!triggerAnalysis || !content.trim()) {
-        return;
-      }
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await fetch('/api/analyze', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ content }),
-        });
-        if (!response.ok) {
-          throw new Error('Failed to analyze content');
+      if (content.trim().length > 0 && triggerAnalysis) {
+        setIsLoading(true);
+        setError(null);
+  
+        try {
+          const response = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content }),
+          });
+  
+          if (!response.ok) {
+            throw new Error('Failed to analyze content');
+          }
+  
+          const result = await response.json();
+  
+          setAnalysis({
+            contentScore: result.contentScore || 0,
+            readability: result.readability || 0,
+            tone: result.tone || 'neutral',
+            keyInsights: result.keyInsights || [],
+            improvements: result.improvements || [],
+          });
+        } catch (error) {
+          console.error('Error analyzing content:', error);
+          setError("I'm sorry, but the content provided is incomplete. Please provide more information or the full content to proceed with the analysis");
+        } finally {
+          setIsLoading(false);
         }
-        const result = await response.json();
-        setAnalysis(result);
-      } catch (error) {
-        console.error('Error analyzing content:', error);
-        setError('Failed to analyze content. Please try again.');
-      } finally {
-        setIsLoading(false);
+      } else {
+        setAnalysis(null);
       }
     };
-
+  
     analyzeContent();
   }, [content, triggerAnalysis]);
 
   if (isLoading) {
     return (
-      <Card className="h-full">
-        <CardContent className="flex items-center justify-center h-full">
-          <motion.div
-            className="w-16 h-16 border-t-4 border-primary rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          />
-        </CardContent>
-      </Card>
-    );
+      <div className="flex items-center justify-center h-full">
+        <motion.div
+          className="w-16 h-16 border-t-4 border-primary rounded-full"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <Card className="h-full">
-        <CardContent className="flex items-center justify-center h-full">
-          <p className="text-destructive">{error}</p>
-        </CardContent>
-      </Card>
-    );
+      <div className="flex items-center justify-center h-64">
+        <p className="text-red-500">{error}</p>
+      </div>
+    )
   }
 
   if (!analysis) {
     return (
-      <Card className="h-full">
-        <CardContent className="flex flex-col items-center justify-center h-full space-y-4">
-          <h2 className="text-2xl font-bold">Content Analysis</h2>
-          <p className="text-muted-foreground text-center max-w-md">
-            Click the &quot;Analyze&quot; button to get detailed insights about your content.
-          </p>
-        </CardContent>
-      </Card>
-    );
+      <div>
+      <h2 className='text-xl font-bold mb-4'>Analyze Content</h2>
+        <p className="text-gray-500">Enter content to see analysis results.</p>
+      </div>
+    )
   }
 
   return (
-    <motion.div
+    <motion.div 
       className="space-y-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Analysis Results</CardTitle>
+      <Card className="cool-card overflow-hidden">
+        <CardHeader className="bg-blue-500 text-primary-foreground">
+          <CardTitle className="flex items-center text-2xl">
+            <Zap className="mr-2" />
+            Content Vibe Score
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { icon: <Type className="h-6 w-6" />, label: 'Word Count', value: analysis.wordCount },
-              { icon: <Clock className="h-6 w-6" />, label: 'Reading Time', value: `${analysis.readingTime} min` },
-              { icon: <Type className="h-6 w-6" />, label: 'Readability', value: `${analysis.readability}%` },
-              { icon: <Zap className="h-6 w-6" />, label: 'Content Score', value: `${analysis.contentScore}%` },
-            ].map((metric, index) => (
-              <motion.div
-                key={`metric-${index}`}
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 10 }}
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center">
+            <motion.div 
+              className="relative w-48 h-48"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 10 }}
+            >
+              <svg className="w-full h-full" viewBox="0 0 100 100">
+                <circle
+                  className="text-muted stroke-[8]"
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="transparent"
+                />
+                <motion.circle
+                  stroke="url(#scoreGradient)"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="transparent"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: analysis.contentScore / 100 }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+              </svg>
+              <motion.div 
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-bold cool-text"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
               >
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center space-x-4">
-                      <div className="p-2 bg-secondary rounded-md">
-                        {metric.icon}
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">{metric.label}</p>
-                        <p className="text-2xl font-bold">{metric.value}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                {Math.round(analysis.contentScore)}
               </motion.div>
-            ))}
+            </motion.div>
           </div>
         </CardContent>
       </Card>
+      <div className="grid grid-cols-2 gap-4">
+        <MetricCard icon={<Type />} label="Word Count" value={wordCount} />
+        <MetricCard icon={<Clock />} label="Reading Time" value={`${readingTime} min`} />
+        <MetricCard icon={<Type />} label="Readability" value={`${Math.round(analysis.readability)}%`} />
+        <MetricCard icon={<AlertCircle />} label="Tone" value={analysis.tone} />
+      </div>
+      <Card className="cool-card overflow-hidden">
+        <CardHeader className="bg-blue-500 text-primary-foreground">
+          <CardTitle className="flex items-center text-2xl">
+            <AlertCircle className="mr-2" />  
+            Key Insights
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <ul className="space-y-2">
+            {analysis.keyInsights.map((insight, index) => (
+              <motion.li 
+                key={index} 
+                className="flex items-center text-sm bg-blue-500 p-2 rounded-lg"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                {insight}
+              </motion.li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+      <Card className="cool-card overflow-hidden">
+        <CardHeader className="bg-blue-500 text-primary-foreground">
+          <CardTitle className="flex items-center text-2xl">
+            <Zap className="mr-2" />
+            Suggested Improvements
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <ul className="space-y-2">
+            {analysis.improvements.map((improvement, index) => (
+              <motion.li 
+                key={index} 
+                className="flex items-center text-sm bg-blue-500 p-2 rounded-lg"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                {improvement}
+              </motion.li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
     </motion.div>
-  );
-};
+  )
+}
 
-export default AnalysisPanel;
+const MetricCard: React.FC<{ icon: React.ReactNode; label: string; value: number | string }> = ({ icon, label, value }) => (
+  <motion.div
+    initial={{ scale: 0.9 }}
+    animate={{ scale: 1 }}
+    transition={{ type: "spring", stiffness: 200, damping: 10 }}
+  >
+    <Card className="cool-card overflow-hidden">
+      <CardHeader className="bg-blue-500 text-primary-foreground p-2">
+        <CardTitle className="flex items-center text-lg">
+          {icon}
+          <span className="ml-2">{label}</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <span className="text-2xl font-bold cool-text">{value}</span>
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
+)
+
+export default AnalysisPanel
+

@@ -103,7 +103,7 @@ const OutlinePanel: React.FC<OutlinePanelProps> = ({
       transition={{ duration: 0.5 }}
     >
       <Card>
-        <CardHeader>
+        <CardHeader className='p-4 bg-blue-500'>
           <CardTitle className="flex items-center text-2xl">
             <List className="mr-2" />
             Content Structure
@@ -141,7 +141,7 @@ const OutlinePanel: React.FC<OutlinePanelProps> = ({
 
       {/* Suggestions Section */}
       <Card>
-        <CardHeader>
+        <CardHeader className='p-4 bg-blue-500'>
           <CardTitle className="flex items-center text-2xl">
             <Lightbulb className="mr-2" />
             Improvement Suggestions
@@ -166,7 +166,7 @@ const OutlinePanel: React.FC<OutlinePanelProps> = ({
 
       {/* Content Gaps Section */}
       <Card>
-        <CardHeader>
+        <CardHeader className='p-4 bg-blue-500'>
           <CardTitle className="flex items-center text-2xl">
             <AlertTriangle className="mr-2" />
             Content Gaps

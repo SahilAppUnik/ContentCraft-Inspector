@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ContentInput from '../components/ContentInput';
-// import { ContentEditor } from '../components/ContentEditor';
+import { ContentEditor } from '../components/ContentEditor';
 import AnalysisPanel from '../components/AnalysisPanel';
 import OutlinePanel from '../components/OutlinePanel';
 import InfoGainPanel from '../components/InfoGainPanel';
@@ -126,25 +126,18 @@ export default function Home() {
                     onAnalyze={handlePlagiarismCheck}
                     buttonText="Check Plagiarism"
                   />
-                ):(<ContentInput
-                  content={analyzeContent}
-                  setContent={setAnalyzeContent}
-                  onAnalyze={handleAnalyzeFromInput}
-                />)
-                }
-               {/* : mode === 'create' ? (
-                <ContentEditor 
-                initialContent={createContent}
-                   onAnalyze={handleAnalyzeFromEditor}
-                   />
-                 ) : (
-                   <ContentInput
-                     content={analyzeContent}
-                     setContent={setAnalyzeContent}
-                     onAnalyze={handleAnalyzeFromInput}
-                   /> */}
-                 {/* )} */}
-   
+                ) : mode === 'create' ? (
+                  <ContentEditor 
+                    initialContent={createContent}
+                    onAnalyze={handleAnalyzeFromEditor}
+                  />
+                ) : (
+                  <ContentInput
+                    content={analyzeContent}
+                    setContent={setAnalyzeContent}
+                    onAnalyze={handleAnalyzeFromInput}
+                  />
+                )}
               </motion.div>
               <motion.div
                 initial={{ x: 50, opacity: 0 }}
@@ -160,10 +153,18 @@ export default function Home() {
                 ) : (
                   <Tabs defaultValue="analysis" className="h-full flex flex-col">
                     <TabsList className="grid w-full grid-cols-4 bg-card p-0 rounded-2xl">
-                      <TabsTrigger value="analysis" className="rounded-xl text-lg py-3">Analysis 📊</TabsTrigger>
-                      <TabsTrigger value="outline" className="rounded-xl text-lg py-3">Outline 📝</TabsTrigger>
-                      <TabsTrigger value="infogain" className="rounded-xl text-lg py-3">Info Gain 🧠</TabsTrigger>
-                      <TabsTrigger value="rephrased" className="rounded-xl text-lg py-3">Rephrased ✍️</TabsTrigger>
+                      <TabsTrigger value="analysis" className="rounded-xl text-lg py-3">
+                        Analysis 📊
+                      </TabsTrigger>
+                      <TabsTrigger value="outline" className="rounded-xl text-lg py-3">
+                        Outline 📝
+                      </TabsTrigger>
+                      <TabsTrigger value="infogain" className="rounded-xl text-lg py-3">
+                        Info Gain 🧠
+                      </TabsTrigger>
+                      <TabsTrigger value="rephrased" className="rounded-xl text-lg py-3">
+                        Rephrased ✍️
+                      </TabsTrigger>
                     </TabsList>
                     <div className="p-6 bg-card mt-6 rounded-2xl border flex-1 min-h-0 overflow-hidden">
                       <TabsContent value="analysis" className="h-full">

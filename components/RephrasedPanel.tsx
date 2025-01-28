@@ -95,7 +95,7 @@ const RephrasedPanel: React.FC<RephrasedPanelProps> = ({
     >
       {/* Rephrased Content Section */}
       <Card>
-        <CardHeader>
+        <CardHeader className='p-4 bg-blue-500'>
           <CardTitle className="flex items-center text-2xl">
             <Zap className="mr-2" />
             Rephrased Content
@@ -108,7 +108,7 @@ const RephrasedPanel: React.FC<RephrasedPanelProps> = ({
 
       {/* Key Highlights Section */}
       <Card>
-        <CardHeader>
+        <CardHeader className='p-4 bg-blue-500'>
           <CardTitle className="flex items-center text-2xl">
             <Lightbulb className="mr-2" />
             Key Highlights
