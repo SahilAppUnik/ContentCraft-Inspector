@@ -22,7 +22,10 @@ interface TavilyData {
   relatedQueries: string[];
 }
 
-const InfoGainPanel: React.FC<InfoGainPanelProps> = ({ content, triggerInfoGain }) => {
+const InfoGainPanel: React.FC<InfoGainPanelProps> = ({
+  content,
+  triggerInfoGain,
+}) => {
   const [tavilyData, setTavilyData] = useState<TavilyData | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -35,15 +38,11 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({ content, triggerInfoGain 
   }, [content, triggerInfoGain]);
 
   const extractMainTopic = (text: string): string => {
-    // This is a simple implementation. You might want to use a more sophisticated method
-    // to extract the main topic, such as natural language processing or keyword extraction.
     const words = text.split(/\s+/);
-    return words.slice(0, 3).join(' '); // Take the first three words as the main topic
+    return words.slice(0, 3).join(' ');
   };
 
   const fetchInfoGain = async (topic: string) => {
-    console.log('topic', topic);
-
     setIsLoading(true);
     try {
       const response = await fetch('/api/infogain', {
@@ -68,23 +67,25 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({ content, triggerInfoGain 
   };
 
   return (
-    <div className="h-full overflow-hidden flex flex-col">
+    <div className="h-full flex flex-col relative">
+      <div className="absolute inset-0 overflow-y-auto">
+      <div className="p-6 space-y-6">
       <motion.div
-        className="flex-1 overflow-y-auto pr-2"
+        className="flex-1 overflow-y-auto custom-scrollbar"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
         <Card>
-          <CardHeader className="bg-[#171717] border-b border-[#2a2a2a] sticky top-0 z-10 p-4">
-            <CardTitle className="flex items-center text-xl text-white">
+          <CardHeader className="bg-white border-b border-gray-200 sticky top-0 z-10 p-4">
+            <CardTitle className="flex items-center text-xl text-gray-900">
               <Search className="mr-2 h-5 w-5" />
               Knowledge Expansion
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 bg-[#0d0d0d]">
+          <CardContent className="pt-6 bg-white">
             <motion.div
-              className="flex space-x-2 mb-6 sticky top-[72px] z-10 bg-[#0d0d0d] pt-2 pb-4"
+              className="flex space-x-2 mb-6 sticky top-[72px] z-10 bg-white pt-2 pb-4"
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -96,7 +97,7 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({ content, triggerInfoGain 
                     placeholder="Search for more information..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full h-10 pl-4 pr-12 bg-[#171717] border-0 rounded-l-full focus:ring-0 focus:outline-none text-white placeholder-gray-400"
+                    className="w-full h-10 pl-4 pr-12 bg-white border border-gray-200 rounded-l-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <Button
                     onClick={handleSearch}
@@ -121,35 +122,35 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({ content, triggerInfoGain 
               <div className="space-y-6">
                 {tavilyData.answer && (
                   <motion.div
-                    className="p-4 bg-[#171717] rounded-lg border border-border"
+                    className="p-4 bg-gray-50 rounded-lg border border-gray-200"
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.1 }}
                   >
-                    <h3 className="text-lg font-semibold mb-2 flex items-center text-foreground">
+                    <h3 className="text-lg font-semibold mb-2 flex items-center text-gray-900">
                       <BookOpen className="w-5 h-5 mr-2" />
                       Summary
                     </h3>
-                    <p className="text-sm text-muted-foreground">{tavilyData.answer}</p>
+                    <p className="text-sm text-gray-700">{tavilyData.answer}</p>
                   </motion.div>
                 )}
 
                 {tavilyData.relatedQueries?.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-3 sticky top-[140px] bg-[#0d0d0d] pt-2 pb-1 z-10 text-foreground">
+                    <h3 className="text-lg font-semibold mb-3 sticky top-[140px] bg-white pt-2 pb-1 z-10 text-gray-900">
                       Related Questions
                     </h3>
                     <ul className="space-y-3">
                       {tavilyData.relatedQueries.map((query, index) => (
                         <motion.li
                           key={index}
-                          className="flex items-center text-sm p-3 rounded-lg bg-[#171717] border border-border"
+                          className="flex items-center text-sm p-3 rounded-lg bg-gray-50 border border-gray-200"
                           initial={{ x: -20, opacity: 0 }}
                           animate={{ x: 0, opacity: 1 }}
                           transition={{ delay: index * 0.1 }}
                         >
                           <HelpCircle className="w-4 h-4 mr-2 flex-shrink-0 text-blue-500" />
-                          <span className="text-muted-foreground">{query}</span>
+                          <span className="text-gray-700">{query}</span>
                         </motion.li>
                       ))}
                     </ul>
@@ -158,14 +159,14 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({ content, triggerInfoGain 
 
                 {tavilyData.results?.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-3 sticky top-[140px] bg-[#0d0d0d] pt-2 pb-1 z-10 text-foreground">
+                    <h3 className="text-lg font-semibold mb-3 sticky top-[140px] bg-white pt-2 pb-1 z-10 text-gray-900">
                       Related Links
                     </h3>
                     <ul className="space-y-3">
                       {tavilyData.results.map((item, index) => (
                         <motion.li
                           key={index}
-                          className="bg-[#171717] border border-border rounded-lg overflow-hidden"
+                          className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden"
                           initial={{ y: 10, opacity: 0 }}
                           animate={{ y: 0, opacity: 1 }}
                           transition={{ delay: index * 0.1 }}
@@ -174,16 +175,16 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({ content, triggerInfoGain 
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block hover:bg-[#1f1f1f] transition duration-300 ease-in-out p-4"
+                            className="block hover:bg-gray-100 transition duration-300 ease-in-out p-4"
                           >
                             <motion.h4
-                              className="text-lg font-semibold text-blue-400 flex items-center"
+                              className="text-lg font-semibold text-blue-600 flex items-center"
                               whileHover={{ x: 5 }}
                             >
                               {item.title}
                               <ExternalLink className="w-4 h-4 ml-2" />
                             </motion.h4>
-                            <p className="text-sm text-muted-foreground mt-2">
+                            <p className="text-sm text-gray-700 mt-2">
                               {item.content}
                             </p>
                           </a>
@@ -197,6 +198,8 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({ content, triggerInfoGain 
           </CardContent>
         </Card>
       </motion.div>
+    </div>
+    </div>
     </div>
   );
 };

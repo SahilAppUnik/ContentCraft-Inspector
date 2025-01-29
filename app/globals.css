@@ -6,6 +6,18 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Custom Scrollbar Styles */
+@layer utilities {
+  .custom-scrollbar {
+    @apply [&::-webkit-scrollbar]:w-2 
+           [&::-webkit-scrollbar-track]:bg-gray-100 
+           [&::-webkit-scrollbar-thumb]:bg-gray-300
+           [&::-webkit-scrollbar-thumb]:rounded-full
+           hover:[&::-webkit-scrollbar-thumb]:bg-gray-400
+           [&::-webkit-scrollbar]:h-2;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -127,4 +139,27 @@ body {
 
 .cool-text {
   @apply text-blue-600;
+}
+
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #3b82f6 #f3f4f6;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
 }

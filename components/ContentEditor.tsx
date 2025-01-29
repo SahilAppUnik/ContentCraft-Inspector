@@ -3,15 +3,26 @@
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Button } from './ui/button';
-import { Zap } from 'lucide-react';
+import { Wand2, FileSearch } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 interface ContentEditorProps {
-  initialContent?: string;
-  onAnalyze: (content: string) => void;
+  initialContent: string;
+  onContentChange: (content: string) => void;
+  mode: 'create' | 'analyze' | 'ai-score';
+  onCreate: () => void;
+  onAnalyze: () => void;
+  onAIScore: () => void;
 }
 
-export function ContentEditor({ initialContent = '', onAnalyze }: ContentEditorProps) {
+export function ContentEditor({
+  initialContent,
+  onContentChange,
+  mode,
+  onCreate,
+  onAnalyze,
+  onAIScore
+}: ContentEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [charCount, setCharCount] = useState(0);
   const [wordCount, setWordCount] = useState(0);
@@ -27,28 +38,25 @@ export function ContentEditor({ initialContent = '', onAnalyze }: ContentEditorP
     setContent(initialContent);
   }, [initialContent]);
 
-  const handleEditorChange = (content: string) => {
-    setContent(content);
-    const plainText = content.replace(/<[^>]*>/g, '').trim();
+  const handleEditorChange = (newContent: string) => {
+    setContent(newContent);
+    onContentChange(newContent);
+    const plainText = newContent.replace(/<[^>]*>/g, '').trim();
     setCharCount(plainText.length);
     setWordCount(plainText.split(/\s+/).filter(Boolean).length);
   };
 
-  const handleAnalyze = () => {
-    onAnalyze(content);
-  };
+  const hasContent = content.trim().length > 0;
 
   if (!isMounted) {
     return null;
   }
 
-  const isDark = resolvedTheme === 'light';
-
   return (
     <div className="h-full flex flex-col gap-6 p-6">
       <div className="flex-1 relative border rounded-lg overflow-hidden bg-white shadow-lg">
         <Editor
-          apiKey="hx0u9onhfwzvqbi9esurnf5zia44rxl7avp9qycpveh3meoe"
+          apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
           onInit={(evt, editor) => {
             editorRef.current = editor;
           }}
@@ -184,15 +192,19 @@ export function ContentEditor({ initialContent = '', onAnalyze }: ContentEditorP
           <span>Characters: {charCount}</span>
           <span>Words: {wordCount}</span>
         </div>
-        <Button
-          onClick={handleAnalyze}
-          disabled={!content.trim()}
-          className="gap-3 px-8 py-6 text-lg rounded-xl"
-          size="lg"
-        >
-          <Zap className="h-7 w-7" />
-          Analyze
-        </Button>
+        {mode === 'create' && (
+          <div className="flex gap-4">
+            <Button
+              onClick={onCreate}
+              disabled={!hasContent}
+              className="gap-3 px-8 py-6 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
+              size="lg"
+            >
+              <Wand2 className="h-7 w-7" />
+              Create
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

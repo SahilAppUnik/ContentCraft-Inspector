@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Zap, Upload, FileText } from 'lucide-react';
+import { Zap, Upload, FileText, FileSearch, Wand2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 
@@ -10,12 +10,14 @@ interface ContentInputProps {
   setContent: (content: string) => void;
   onAnalyze: () => void;
   buttonText?: string;
+  mode: 'create' | 'analyze' | 'ai-score';
 }
 
 const ContentInput: React.FC<ContentInputProps> = ({
   content,
   setContent,
   onAnalyze,
+  mode,
   buttonText = "Analyze"
 }) => {
   const [charCount, setCharCount] = useState(0);
@@ -64,6 +66,8 @@ const ContentInput: React.FC<ContentInputProps> = ({
     }
   };
 
+  const hasContent = content.trim().length > 0;
+
   return (
     <div className="h-full flex flex-col gap-4 p-6">
       <div className="flex gap-2 items-center">
@@ -93,12 +97,23 @@ const ContentInput: React.FC<ContentInputProps> = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <Textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Paste your content here to analyze or drag & drop a file..."
-          className="h-full resize-none text-lg p-8 rounded-xl overflow-auto"
-        />
+        <div className="relative h-full flex flex-col">
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Paste your content here to analyze or drag & drop a file..."
+            className="h-full resize-none text-lg p-8 rounded-xl overflow-auto pr-[120px]"
+          />
+          {hasContent && (
+            <Button
+              onClick={onAnalyze}
+              className="absolute right-4 top-4 gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <FileSearch className="h-4 w-4" />
+              Analyze
+            </Button>
+          )}
+        </div>
         {isDragging && (
           <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-xl border-2 border-dashed border-primary">
             <div className="text-center">
@@ -110,23 +125,23 @@ const ContentInput: React.FC<ContentInputProps> = ({
       </div>
       
       <div className="flex justify-between items-center">
-        <motion.div
-          className="flex space-x-8 text-lg text-muted-foreground"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <div className="flex space-x-8 text-lg text-muted-foreground">
           <span>Characters: {charCount}</span>
           <span>Words: {wordCount}</span>
-        </motion.div>
-        <Button
-          onClick={onAnalyze}
-          disabled={content.trim().length === 0}
-          className="gap-3 px-8 py-6 text-lg rounded-xl"
-          size="lg"
-        >
-          <Zap className="h-7 w-7" />
-          {buttonText}
-        </Button>
+        </div>
+        {mode === 'analyze' && (
+          <div className="flex gap-4">
+            <Button
+              onClick={onAnalyze}
+              disabled={!hasContent}
+              className="gap-3 px-8 py-6 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
+              size="lg"
+            >
+              <Wand2 className="h-7 w-7" />
+              Analyze
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
