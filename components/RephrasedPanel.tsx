@@ -51,91 +51,97 @@ const RephrasedPanel: React.FC<RephrasedPanelProps> = ({
 
   if (isLoading) {
     return (
-      <Card className="h-full">
-        <CardContent className="flex items-center justify-center h-full">
-          <motion.div
-            className="w-16 h-16 border-t-4 border-primary rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          />
-        </CardContent>
-      </Card>
+      <div className="h-full flex items-center justify-center">
+        <motion.div
+          className="w-16 h-16 border-t-4 border-primary rounded-full"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Card className="h-full">
-        <CardContent className="flex items-center justify-center h-full">
-          <p className="text-destructive">{error}</p>
-        </CardContent>
-      </Card>
+      <div className="h-full flex items-center justify-center">
+        <p className="text-destructive">{error}</p>
+      </div>
     );
   }
 
   if (!rephrasedContent) {
     return (
-      <Card className="h-full">
-        <CardContent className="flex flex-col items-center justify-center h-full space-y-4">
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center">
           <h2 className="text-2xl font-bold">Content Rephrasing</h2>
           <p className="text-muted-foreground text-center max-w-md">
             Click the &quot;Rephrase&quot; button to get a rephrased version of your content.
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      className="space-y-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      {/* Rephrased Content Section */}
-      <Card>
-        <CardHeader className='p-4 bg-blue-500'>
-          <CardTitle className="flex items-center text-2xl">
-            <Zap className="mr-2" />
-            Rephrased Content
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <p className="text-sm text-foreground whitespace-pre-wrap">{rephrasedContent}</p>
-        </CardContent>
-      </Card>
+    <div className="h-full overflow-hidden flex flex-col">
+      <motion.div
+        className="flex-1 overflow-y-auto pr-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* Rephrased Content Section */}
+        <Card className="mb-6">
+          <CardHeader className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <CardTitle className="flex items-center text-2xl text-gray-900">
+              <Zap className="mr-2" />
+              Rephrased Content
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 bg-gray-50">
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">
+              {rephrasedContent}
+            </p>
+          </CardContent>
+        </Card>
 
-      {/* Key Highlights Section */}
-      <Card>
-        <CardHeader className='p-4 bg-blue-500'>
-          <CardTitle className="flex items-center text-2xl">
-            <Lightbulb className="mr-2" />
-            Key Highlights
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <ul className="space-y-2">
-            <motion.li
-              className="flex items-center text-sm bg-secondary/50 p-2 rounded-lg"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
-              Enhanced clarity and readability in the rephrased version
-            </motion.li>
-            <motion.li
-              className="flex items-center text-sm bg-secondary/50 p-2 rounded-lg"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              Maintained core message while improving expression
-            </motion.li>
-          </ul>
-        </CardContent>
-      </Card>
-    </motion.div>
+        {/* Key Highlights Section */}
+        <Card>
+          <CardHeader className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <CardTitle className="flex items-center text-2xl text-gray-900">
+              <Lightbulb className="mr-2" />
+              Key Highlights
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 bg-gray-50">
+            <ul className="space-y-3">
+              <motion.li
+                className="flex items-center text-sm p-3 rounded-lg bg-white border border-gray-200"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+              >
+                <span className="text-blue-500 mr-2">•</span>
+                <span className="text-gray-700">
+                  Enhanced clarity and readability in the rephrased version
+                </span>
+              </motion.li>
+              <motion.li
+                className="flex items-center text-sm p-3 rounded-lg bg-white border border-gray-200"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <span className="text-blue-500 mr-2">•</span>
+                <span className="text-gray-700">
+                  Maintained core message while improving expression
+                </span>
+              </motion.li>
+            </ul>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
   );
 };
 
