@@ -192,6 +192,19 @@ export function ContentEditor({
           <span>Characters: {charCount}</span>
           <span>Words: {wordCount}</span>
         </div>
+        {mode === 'analyze' && (
+          <div className="flex gap-4">
+            <Button
+              onClick={onAnalyze}
+              disabled={!hasContent}
+              className="gap-3 px-8 py-6 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
+              size="lg"
+            >
+              <Wand2 className="h-7 w-7" />
+              Analyze
+            </Button>
+          </div>
+        )}
         {mode === 'create' && (
           <div className="flex gap-4">
             <Button
