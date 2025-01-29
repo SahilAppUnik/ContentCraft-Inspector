@@ -75,7 +75,7 @@ const RephrasedPanel: React.FC<RephrasedPanelProps> = ({
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900">Content Rephrasing</h2>
           <p className="text-gray-600 text-center max-w-md mt-2">
-            Click the "Rephrase" button to get a rephrased version of your content.
+            Click the &quot;Rephrase&quot; button to get a rephrased version of your content.
           </p>
         </div>
       </div>

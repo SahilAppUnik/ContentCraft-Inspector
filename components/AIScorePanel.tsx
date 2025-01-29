@@ -101,7 +101,7 @@ const AIScorePanel: React.FC<AIScorePanelProps> = ({
           <Brain className="w-16 h-16 text-blue-600 mx-auto mb-6" />
           <h2 className="text-2xl font-bold text-gray-900 mb-3">AI Content Analysis</h2>
           <p className="text-gray-600">
-            Click the "Check AI Score" button to analyze your content for AI influence and get a humanized version.
+            Click the &quot;Check AI Score&quot; button to analyze your content for AI influence and get a humanized version.
           </p>
         </motion.div>
       </div>
