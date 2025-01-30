@@ -4,7 +4,6 @@ orbs:
 
 jobs:
   build-node:
-    # Build Node.js project
     executor: node/default
     steps:
       - checkout
@@ -22,21 +21,21 @@ jobs:
 
   deploy:
     docker:
-      - image: cimg/node:20.10.0
+      - image: cimg/node:20.10.0  # ✅ Ensure correct Node.js version
     steps:
       - checkout
       - run:
-          name: Install Netlify CLI
+          name: Install Netlify CLI globally
           command: npm install -g netlify-cli
       - run:
-          name: Verify Netlify CLI installation
-          command: netlify --version
+          name: Authenticate with Netlify
+          command: netlify login --auth $NETLIFY_AUTH_TOKEN  # ✅ Ensures CLI uses correct token
       - run:
           name: Verify Netlify authentication
-          command: netlify status
+          command: netlify status  # ✅ Check authentication & site details
       - run:
           name: Deploy to Netlify
-          command: netlify deploy --dir=.next
+          command: netlify deploy --dir=.next --prod --auth $NETLIFY_AUTH_TOKEN --site $NETLIFY_SITE_ID
           environment:
             NETLIFY_AUTH_TOKEN: $NETLIFY_AUTH_TOKEN
             NETLIFY_SITE_ID: $NETLIFY_SITE_ID
