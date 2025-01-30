@@ -32,6 +32,9 @@ jobs:
           name: Verify Netlify CLI installation
           command: netlify --version
       - run:
+          name: Verify Netlify authentication
+          command: netlify status
+      - run:
           name: Deploy to Netlify
           command: netlify deploy --dir=.next
           environment:
