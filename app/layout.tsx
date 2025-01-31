@@ -1,28 +1,15 @@
-import type { Metadata } from 'next';
+import type { ReactNode } from "react";
 import './globals.css';
-import { ThemeProvider } from '@/components/theme-provider';
 
-export const metadata: Metadata = {
-  title: 'AppUnik Content Scanner',
-  description: 'Made with AppUnik',
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+    <html lang="en">
+      <head>
+        <title>ContentCraft-Inspector</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body className="bg-gray-100">
+        {children}
       </body>
     </html>
   );
