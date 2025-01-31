@@ -218,6 +218,19 @@ export function ContentEditor({
             </Button>
           </div>
         )}
+        {mode === 'ai-score' && (
+          <div className="flex gap-4">
+            <Button
+              onClick={onAIScore}
+              disabled={!hasContent}
+              className="gap-3 px-8 py-6 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
+              size="lg"
+            >
+              <Wand2 className="h-7 w-7" />
+              Check Score
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
