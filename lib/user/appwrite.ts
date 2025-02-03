@@ -52,9 +52,7 @@ export async function login(email: string, password: string) {
       }),
     });
 
-    const data = await response.json();
-    console.log('data', data);
-    
+    const data = await response.json();    
 
     if (!response.ok) {
       throw new Error(data.message || 'Login failed.');
