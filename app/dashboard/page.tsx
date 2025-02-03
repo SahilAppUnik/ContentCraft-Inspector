@@ -69,23 +69,13 @@ export default function Home() {
   };
 
   const handleAnalyze = () => {
-    if (mode === 'ai-generate') {
-      setShowAIGenerateAnalysis(true);
-      setShowAIGenerateScore(false);
-    } else {
-      setMode('analyze');
-      setTriggerAnalysis(true);
-    }
+    setMode('analyze');
+    setTriggerAnalysis(true);
   };
 
   const handleAIScore = () => {
-    if (mode === 'ai-generate') {
-      setShowAIGenerateScore(true);
-      setShowAIGenerateAnalysis(false);
-    } else {
-      setMode('ai-score');
-      setTriggerAIScore(true);
-    }
+    setMode('ai-score');
+    setTriggerAIScore(true);
   };
 
   const handleModeChange = (newMode: AppMode) => {

@@ -15,7 +15,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
 
   const generateContent = async () => {
     if (!title.trim()) return;
-
+    
     setLoading(true);
     try {
       // Replace with your actual GPT API call
@@ -26,7 +26,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
         },
         body: JSON.stringify({ title }),
       });
-
+      
       const data = await response.json();
       setGeneratedContent(data.content);
       onContentGenerated(data.content);
@@ -41,7 +41,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
     <div className="h-full flex flex-col">
       {/* Input Section - Fixed at top */}
       <div className="p-6 border-b border-gray-200 bg-white">
-        <h2 className="text-2xl font-semibold mb-4">Generate AI Content</h2>
+        <h2 className="text-2xl font-semibold mb-4">Generate AI-Powered Content</h2>
         <p className="text-gray-600 mb-4">
           Enter a title or topic, and our AI will generate detailed content for you.
         </p>
@@ -73,7 +73,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
       </div>
 
       {/* Generated Content Section - Scrollable */}
-      <div className="flex-1 min-h-0 relative">
+      {/* <div className="flex-1 min-h-0 relative">
         <motion.div
           className="absolute inset-0 overflow-y-auto px-6 py-4"
           initial={{ opacity: 0 }}
@@ -86,7 +86,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
             </div>
           )}
         </motion.div>
-      </div>
+      </div> */}
     </div>
   );
 }

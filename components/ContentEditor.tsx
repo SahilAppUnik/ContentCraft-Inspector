@@ -214,7 +214,7 @@ export function ContentEditor({
               size="lg"
             >
               <Wand2 className="h-7 w-7" />
-              Create
+              Verify
             </Button>
           </div>
         )}
@@ -226,8 +226,8 @@ export function ContentEditor({
               className="gap-3 px-8 py-6 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
               size="lg"
             >
-              <Check className="h-7 w-7" />
-              Check Score
+              <Wand2 className="h-7 w-7" />
+                Analyze
             </Button>
           </div>
         )}
