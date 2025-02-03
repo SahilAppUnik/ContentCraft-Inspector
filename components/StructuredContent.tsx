@@ -15,6 +15,7 @@ const StructuredView: React.FC<StructuredViewProps> = ({
 }) => {
   return (
     <div className="h-full flex flex-col bg-white">
+      {/* Header Section */}
       <div className="p-4 border-b border-gray-100 flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-900">Structured Content</h2>
         <div className="flex gap-2">
@@ -34,7 +35,9 @@ const StructuredView: React.FC<StructuredViewProps> = ({
           </Button>
         </div>
       </div>
-      <div className="flex-1 p-6 overflow-auto">
+
+      {/* Scrollable Content Section */}
+      <div className="flex-1 p-6 overflow-y-auto max-h-[70vh]">
         <div 
           className="prose max-w-none"
           dangerouslySetInnerHTML={{ __html: content }} 
@@ -43,5 +46,6 @@ const StructuredView: React.FC<StructuredViewProps> = ({
     </div>
   );
 };
+
 
 export default StructuredView;

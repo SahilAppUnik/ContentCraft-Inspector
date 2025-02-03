@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Button } from './ui/button';
-import { Wand2, FileSearch } from 'lucide-react';
+import { Wand2, Check } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 interface ContentEditorProps {
   initialContent: string;
   onContentChange: (content: string) => void;
-  mode: 'create' | 'analyze' | 'ai-score';
+  mode: 'ai-generate' | 'create' | 'analyze' | 'ai-score';
   onCreate: () => void;
   onAnalyze: () => void;
   onAIScore: () => void;
@@ -54,7 +54,7 @@ export function ContentEditor({
 
   return (
     <div className="h-full flex flex-col gap-6 p-6">
-      <div className="flex-1 relative border rounded-lg overflow-hidden bg-white shadow-lg">
+      <div className="flex-1 relative border rounded-lg overflow-auto bg-white shadow-lg">
         <Editor
           apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
           onInit={(evt, editor) => {
@@ -226,7 +226,7 @@ export function ContentEditor({
               className="gap-3 px-8 py-6 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
               size="lg"
             >
-              <Wand2 className="h-7 w-7" />
+              <Check className="h-7 w-7" />
               Check Score
             </Button>
           </div>
