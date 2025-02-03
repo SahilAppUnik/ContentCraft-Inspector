@@ -144,7 +144,7 @@ body {
 }
 
 .overflow-y-auto {
-  scrollbar-color: #3b82f6 #f3f4f6;
+  scrollbar-color: #bab9b9 #f0f0f0;
 }
 
 .overflow-y-auto::-webkit-scrollbar {
