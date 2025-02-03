@@ -326,7 +326,7 @@ export default function Home() {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.5 }}
-                  className="w-[80%] h-[80%] bg-white rounded-2xl border border-gray-100 shadow-lg overflow-auto justify-center"
+                  className="w-[80%] h-[80%] bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden"
                 >
                   <div className="h-full flex flex-col p-8">
                     <div className="p-4 border-b border-gray-100">
@@ -341,20 +341,18 @@ export default function Home() {
             ) : mode === 'ai-generate' && hasGeneratedContent ? (
               // Two-column layout after content generation
               <div className="grid grid-cols-2 gap-10 h-full">
-                {/* Left Column - Input */}
+                {/* Left Column - Input Panel */}
                 <motion.div
                   initial={{ x: -50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-lg h-full overflow-hidden"
+                  className="bg-white rounded-2xl border border-gray-100 shadow-lg h-full overflow-hidden flex flex-col"
                 >
-                  <div className="h-full flex flex-col">
-                    <div className="p-4 border-b border-gray-100">
-                      <h2 className="text-xl font-semibold">Generate New Content</h2>
-                    </div>
-                    <div className="flex-1 overflow-auto p-6">
-                      <AIGeneratePanel onContentGenerated={handleGeneratedContent} />
-                    </div>
+                  <div className="p-4 border-b border-gray-100 flex-shrink-0">
+                    <h2 className="text-xl font-semibold">Generate New Content</h2>
+                  </div>
+                  <div className="flex-1 overflow-auto p-6">
+                    <AIGeneratePanel onContentGenerated={handleGeneratedContent} />
                   </div>
                 </motion.div>
 
@@ -363,43 +361,34 @@ export default function Home() {
                   initial={{ x: 50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
-                  className="flex flex-col gap-6 h-full"
+                  className="bg-white rounded-2xl border border-gray-100 shadow-lg h-full flex flex-col"
                 >
-                  {/* Generated Content Panel */}
-                  <div className="bg-white rounded-2xl border border-gray-100 shadow-lg flex-1 flex flex-col">
-                    {/* <div className="h-full flex flex-col"> */}
-                    <div className="p-4 border-b border-gray-100 flex justify-between items-center flex-shrink-0">
-                      <h2 className="text-xl font-semibold">Generated Content</h2>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={handleAnalyze}
-                          className="gap-2 px-4 py-2 rounded-lg flex items-center bg-blue-600 text-white hover:bg-blue-700"
-                        >
-                          <FileSearch className="h-5 w-5" />
-                          Analyze
-                        </button>
-                        <button
-                          onClick={handleAIScore}
-                          className="gap-2 px-4 py-2 rounded-lg flex items-center bg-blue-600 text-white hover:bg-blue-700"
-                        >
-                          <Robot className="h-5 w-5" />
-                          AI Score
-                        </button>
-                      </div>
+                  <div className="p-4 border-b border-gray-100 flex justify-between items-center flex-shrink-0">
+                    <h2 className="text-xl font-semibold">Generated Content</h2>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleAnalyze}
+                        className="gap-2 px-4 py-2 rounded-lg flex items-center bg-blue-600 text-white hover:bg-blue-700"
+                      >
+                        <FileSearch className="h-5 w-5" />
+                        Analyze
+                      </button>
+                      <button
+                        onClick={handleAIScore}
+                        className="gap-2 px-4 py-2 rounded-lg flex items-center bg-blue-600 text-white hover:bg-blue-700"
+                      >
+                        <Robot className="h-5 w-5" />
+                        AI Score
+                      </button>
                     </div>
-
-                    {/* Scrollable Content Area */}
-                    <div className="flex-1 p-6 overflow-auto">
-                          <div
-                            className="prose max-w-none"
-                            dangerouslySetInnerHTML={{ __html: generatedContent }}
-                          />
-                        </div>
-                      </div>
-
+                  </div>
+                 {/* Scrollable Content */}
+                 <div className="flex-1 p-6 overflow-auto" style={{ position: 'relative', overflowY: 'auto', scrollbarColor: '#3b82f6 #f3f4f6' }}>
+                    <div className="prose max-w-none" style={{ position: 'absolute', paddingRight: '10px' }} dangerouslySetInnerHTML={{ __html: generatedContent }} />
+                  </div> 
                   {/* Analysis/Score Panel */}
                   {(showAIGenerateAnalysis || showAIGenerateScore) && (
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-lg flex-1 overflow-hidden">
+                    <div className="border-t border-gray-100 flex-1 overflow-hidden">
                       {showAIGenerateAnalysis && (
                         <Tabs defaultValue="analysis" className="h-full flex flex-col">
                           <TabsList className="grid w-full grid-cols-3 bg-white p-4 border-b border-gray-100">
@@ -409,32 +398,20 @@ export default function Home() {
                           </TabsList>
                           <div className="flex-1 overflow-auto">
                             <TabsContent value="analysis" className="p-4">
-                              <AnalysisPanel
-                                content={generatedContent}
-                                triggerAnalysis={showAIGenerateAnalysis}
-                              />
+                              <AnalysisPanel content={generatedContent} triggerAnalysis={showAIGenerateAnalysis} />
                             </TabsContent>
                             <TabsContent value="outline" className="p-4">
-                              <OutlinePanel
-                                content={generatedContent}
-                                triggerOutline={showAIGenerateAnalysis}
-                              />
+                              <OutlinePanel content={generatedContent} triggerOutline={showAIGenerateAnalysis} />
                             </TabsContent>
                             <TabsContent value="infogain" className="p-4">
-                              <InfoGainPanel
-                                content={generatedContent}
-                                triggerInfoGain={showAIGenerateAnalysis}
-                              />
+                              <InfoGainPanel content={generatedContent} triggerInfoGain={showAIGenerateAnalysis} />
                             </TabsContent>
                           </div>
                         </Tabs>
                       )}
                       {showAIGenerateScore && (
-                        <div className="p-4 h-full overflow-auto">
-                          <AIScorePanel
-                            content={generatedContent}
-                            triggerAIScore={showAIGenerateScore}
-                          />
+                        <div className="p-4 flex-1 overflow-auto">
+                          <AIScorePanel content={generatedContent} triggerAIScore={showAIGenerateScore} />
                         </div>
                       )}
                     </div>
@@ -448,7 +425,7 @@ export default function Home() {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.5 }}
-                  className="w-[80%] h-[80%] bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden"
+                  className="bg-white rounded-2xl border border-gray-100 shadow-lg h-full overflow-hidden"
                 >
                   <ContentEditor
                     initialContent={content}
@@ -468,7 +445,7 @@ export default function Home() {
                   initial={{ x: -50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-lg h-full overflow-hidden"
+                  className="bg-white rounded-2xl border border-gray-100 shadow-lg h-[calc(100vh-200px)] overflow-hidden"
                 >
                   <ContentEditor
                     initialContent={content}
@@ -483,7 +460,7 @@ export default function Home() {
                 {/* Right Column */}
                 <div className="h-full flex flex-col">
                   {mode === 'analyze' && (
-                    <Tabs defaultValue="analysis" className="h-full flex flex-col">
+                    <Tabs defaultValue="analysis" className="h-[calc(100vh-200px)] flex flex-col">
                       <div className="flex items-center justify-between gap-4 mb-4">
                         <TabsList className="grid w-full grid-cols-3 bg-white p-0 rounded-xl border border-gray-100 shadow-lg">
                           <TabsTrigger
@@ -552,7 +529,7 @@ export default function Home() {
                       initial={{ x: 50, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ duration: 0.5, delay: 0.4 }}
-                      className="bg-white rounded-2xl border border-gray-100 shadow-lg h-full overflow-hidden"
+                      className="bg-white rounded-2xl border border-gray-100 shadow-lg h-[calc(100vh-200px)] overflow-hidden"
                     >
                       <div className="h-full flex flex-col">
                         <div className="p-4 border-b border-gray-100 flex justify-between items-center">
@@ -589,7 +566,7 @@ export default function Home() {
                       initial={{ x: 50, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ duration: 0.5, delay: 0.4 }}
-                      className="bg-white rounded-2xl border border-gray-100 shadow-lg h-full overflow-hidden"
+                      className="bg-white rounded-2xl border border-gray-100 shadow-lg h-[calc(100vh-200px)] overflow-hidden"
                     >
                       <div className="p-4 h-full overflow-auto">
                         <AIScorePanel
@@ -603,8 +580,8 @@ export default function Home() {
               </div>
             )}
           </div>
-        </motion.div>
-      </div>
-    </div>
+        </motion.div >
+      </div >
+    </div >
   );
 }

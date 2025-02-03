@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Wand2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface AIGeneratePanelProps {
   onContentGenerated: (content: string) => void;
@@ -14,7 +15,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
 
   const generateContent = async () => {
     if (!title.trim()) return;
-    
+
     setLoading(true);
     try {
       // Replace with your actual GPT API call
@@ -25,7 +26,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
         },
         body: JSON.stringify({ title }),
       });
-      
+
       const data = await response.json();
       setGeneratedContent(data.content);
       onContentGenerated(data.content);
@@ -72,12 +73,19 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
       </div>
 
       {/* Generated Content Section - Scrollable */}
-      <div className="flex-1 overflow-y-auto p-6">
-        {generatedContent && (
-          <div className="prose prose-lg max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: generatedContent }} />
-          </div>
-        )}
+      <div className="flex-1 min-h-0 relative">
+        <motion.div
+          className="absolute inset-0 overflow-y-auto px-6 py-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {generatedContent && (
+            <div className="prose prose-lg max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: generatedContent }} />
+            </div>
+          )}
+        </motion.div>
       </div>
     </div>
   );
