@@ -8,7 +8,7 @@ export default function Home() {
 
   useEffect(() => {
     router.push('/welcome'); // Redirect to welcome page by default
-  }, []);
+  }, [router]);
 
   return null; // Nothing to render, just redirecting
 }

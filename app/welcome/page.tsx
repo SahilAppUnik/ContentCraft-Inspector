@@ -86,7 +86,7 @@ export default function Welcome() {
              hover:bg-blue-700 transform hover:-translate-y-1 transition-all duration-200
              shadow-lg hover:shadow-xl`}
           >
-            Get Started - It's Free
+            Get Started - It&apos;s Free
           </button>
 
           <button

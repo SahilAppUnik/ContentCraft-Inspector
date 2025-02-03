@@ -69,8 +69,8 @@ export default function Login() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label 
-            htmlFor="email" 
+          <Label
+            htmlFor="email"
             className={`block text-sm font-medium ${error?.field === 'email' ? 'text-red-500' : 'text-gray-700'}`}
           >
             Email Address
@@ -105,7 +105,7 @@ export default function Login() {
         </div>
 
         <div>
-          <Label 
+          <Label
             htmlFor="password"
             className={`block text-sm font-medium ${error?.field === 'password' ? 'text-red-500' : 'text-gray-700'}`}
           >
@@ -173,9 +173,9 @@ export default function Login() {
           </Button>
 
           <p className="mt-4 text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link 
-              href="/auth/signup" 
+            Don&apos;t have an account?{' '}
+            <Link
+              href="/auth/signup"
               className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
             >
               Sign up
