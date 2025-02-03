@@ -76,7 +76,7 @@ export default function Welcome() {
         {/* Action Buttons */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          animate={{ y: 0, opacity: 1 }}                                                                                                         
           transition={{ duration: 0.8, delay: 0.4 }}
           className="flex justify-center gap-6"
         >

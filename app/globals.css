@@ -144,7 +144,6 @@ body {
 }
 
 .overflow-y-auto {
-  scrollbar-width: thin;
   scrollbar-color: #3b82f6 #f3f4f6;
 }
 

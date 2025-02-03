@@ -113,7 +113,6 @@ const AIScorePanel: React.FC<AIScorePanelProps> = ({
       <div 
         className="absolute inset-0 overflow-y-auto"
         style={{
-          scrollbarWidth: 'thin',
           scrollbarColor: '#3b82f6 #f3f4f6',
         }}
       >
