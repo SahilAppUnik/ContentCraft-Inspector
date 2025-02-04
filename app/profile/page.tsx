@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const [memberSince, setMemberSince] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -38,6 +39,7 @@ export default function ProfilePage() {
         const userData = await getUser(sessionToken);
         setUser(userData);
         setNewName(userData.name);
+        setMemberSince(formatDate(userData.$createdAt));
       } catch (error) {
         console.error('Profile fetch failed:', error);
         router.push('/auth/login');
@@ -45,6 +47,8 @@ export default function ProfilePage() {
         setLoading(false);
       }
     };
+    console.log('memberSince', memberSince);
+    
 
     fetchProfile();
   }, [router]);
@@ -95,6 +99,11 @@ export default function ProfilePage() {
     setEditing(false);
     setNewName(user?.name || '');
     setError(null);
+  };
+
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
   };
 
   if (loading) {
@@ -280,7 +289,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900">Member Since</h3>
-                  <p className="text-sm text-gray-500">January 2024</p>
+                  <p className="text-sm text-gray-500">{memberSince}</p>
                 </div>
               </div>
             </motion.div>
