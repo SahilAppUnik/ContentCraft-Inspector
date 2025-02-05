@@ -101,7 +101,7 @@ const AIScorePanel: React.FC<AIScorePanelProps> = ({
           <Brain className="w-16 h-16 text-blue-600 mx-auto mb-6" />
           <h2 className="text-2xl font-bold text-gray-900 mb-3">AI Content Analysis</h2>
           <p className="text-gray-600">
-            Click the &quot;Check AI Score&quot; button to analyze your content for AI influence and get a humanized version.
+            Click on &quot;Verify&quot; button to analyze your content for AI influence and get a humanized version.
           </p>
         </motion.div>
       </div>
@@ -113,7 +113,7 @@ const AIScorePanel: React.FC<AIScorePanelProps> = ({
       <div 
         className="absolute inset-0 overflow-y-auto"
         style={{
-          scrollbarColor: '#3b82f6 #f3f4f6',
+          scrollbarColor: '#bab9b9 #f0f0f0',
         }}
       >
         <div className="p-6 space-y-6">
@@ -128,7 +128,7 @@ const AIScorePanel: React.FC<AIScorePanelProps> = ({
               <div className="space-y-6">
                 {/* AI Score Section */}
                 <motion.div
-                  className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-white border border-blue-100"
+                  className="p-6 rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-200"
                   initial={{ scale: 0.95 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.5 }}

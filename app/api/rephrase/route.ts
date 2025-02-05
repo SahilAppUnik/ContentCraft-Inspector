@@ -1,9 +1,7 @@
 import axios from "axios";
 
 export async function POST(req: Request) {
-  const { content } = await req.json();
-  console.log('input', content);
-  
+  const { content } = await req.json();  
 
   const response = await axios.post(
     "https://api.openai.com/v1/chat/completions",

@@ -46,9 +46,7 @@ export default function ProfilePage() {
       } finally {
         setLoading(false);
       }
-    };
-    console.log('memberSince', memberSince);
-    
+    };    
 
     fetchProfile();
   }, [router]);
@@ -142,7 +140,7 @@ export default function ProfilePage() {
               className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl"
             >
               <LogOut className="h-5 w-5" />
-              {loading ? 'Logging out...' : 'Sign Out'}
+              {loading ? 'Signing out...' : 'Sign Out'}
             </Button>
           </div>
         </div>

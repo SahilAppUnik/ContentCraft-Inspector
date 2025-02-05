@@ -227,7 +227,7 @@ export function ContentEditor({
               size="lg"
             >
               <Wand2 className="h-7 w-7" />
-                Analyze
+                Verify
             </Button>
           </div>
         )}

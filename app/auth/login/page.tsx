@@ -49,7 +49,7 @@ export default function Login() {
     try {
       const session = await login(email, password);
       localStorage.setItem('sessionToken', session.secret);
-      router.push('/dashboard');
+      router.push('/home');
     } catch (error) {
       setError({
         field: 'general',

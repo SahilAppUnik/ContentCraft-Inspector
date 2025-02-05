@@ -7,20 +7,22 @@ import OutlinePanel from '@/components/OutlinePanel';
 import InfoGainPanel from '@/components/InfoGainPanel';
 import AIScorePanel from '@/components/AIScorePanel';
 import { motion } from 'framer-motion';
-import { Edit, FileSearch, LogOut, Notebook as Robot, UserCircle, Wand2 } from 'lucide-react';
+import { Edit, FileSearch, LogOut, Notebook as Robot, UserCircle, Wand2, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ContentEditor from '@/components/ContentEditor';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { logout } from '@/lib/user/appwrite';
 import AIGeneratePanel from '@/components/AIGeneratePanel';
 
 type AppMode = 'ai-generate' | 'create' | 'analyze' | 'ai-score';
 
-export default function Home() {
+export default function Dashboard() {
+  const searchParams = useSearchParams();
+  const initialMode = searchParams.get('mode') as AppMode || 'ai-generate';
+
   // States
-  const [showWelcome, setShowWelcome] = useState(true);
   const [content, setContent] = useState('');
-  const [mode, setMode] = useState<AppMode>('create');
+  const [mode, setMode] = useState<AppMode>(initialMode);
   const [showStructured, setShowStructured] = useState(false);
   const [triggerAnalysis, setTriggerAnalysis] = useState(false);
   const [triggerAIScore, setTriggerAIScore] = useState(false);
@@ -80,7 +82,7 @@ export default function Home() {
 
   const handleModeChange = (newMode: AppMode) => {
     setMode(newMode);
-    setShowWelcome(false);
+    router.push(`/dashboard?mode=${newMode}`);
     setShowStructured(false);
     setTriggerAnalysis(false);
     setTriggerAIScore(false);
@@ -89,10 +91,13 @@ export default function Home() {
     setHasGeneratedContent(false);
     setGeneratedContent('');
   };
-
   const handleShowProfile = () => {
     router.push('/profile');
   };
+
+  const handleHistory = () => {
+    router.push('/history');
+  }
 
   const handleGeneratedContent = (generatedContent: string) => {
     setGeneratedContent(generatedContent);
@@ -100,159 +105,72 @@ export default function Home() {
     setHasGeneratedContent(true);
   };
 
-  // Welcome screen component
-  const WelcomeScreen = () => (
-    <div className="w-full h-full flex flex-col items-center justify-center px-6">
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-16"
-      >
-        <h1 className="text-6xl font-bold text-gray-900 mb-6">
-          Welcome to ContentCraft Inspector
-        </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Your all-in-one platform for content creation, analysis, and optimization
-        </p>
-      </motion.div>
-
-      <div className="grid grid-cols-3 gap-8 w-full max-w-6xl">
-        {/* Generate with AI Card */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          onClick={() => handleModeChange('ai-generate')}
-          className="bg-white rounded-2xl border border-gray-100 shadow-lg p-8 cursor-pointer 
-                     hover:shadow-xl transition-all transform hover:-translate-y-1"
-        >
-          <div className="flex flex-col items-center text-center">
-            <div className="bg-blue-100 p-4 rounded-full mb-6">
-              <Wand2 className="h-12 w-12 text-blue-600" />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Generate with AI</h2>
-            <p className="text-gray-600">
-              Create high-quality content instantly using our advanced AI technology
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Create Content Card */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          onClick={() => handleModeChange('create')}
-          className="bg-white rounded-2xl border border-gray-100 shadow-lg p-8 cursor-pointer 
-                     hover:shadow-xl transition-all transform hover:-translate-y-1"
-        >
-          <div className="flex flex-col items-center text-center">
-            <div className="bg-green-100 p-4 rounded-full mb-6">
-              <Edit className="h-12 w-12 text-green-600" />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Create Content</h2>
-            <p className="text-gray-600">
-              Write and edit your content with our powerful editor tools
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Analyze Content Card */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          onClick={() => handleModeChange('analyze')}
-          className="bg-white rounded-2xl border border-gray-100 shadow-lg p-8 cursor-pointer 
-                     hover:shadow-xl transition-all transform hover:-translate-y-1"
-        >
-          <div className="flex flex-col items-center text-center">
-            <div className="bg-purple-100 p-4 rounded-full mb-6">
-              <FileSearch className="h-12 w-12 text-purple-600" />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Analyze Content</h2>
-            <p className="text-gray-600">
-              Get detailed insights and analysis of your content
-            </p>
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-
-  // Main render
   return (
     <div className="min-h-screen h-screen flex bg-white">
-      {/* Sidebar - Only show when not in welcome screen */}
-      {!showWelcome && (
-        <div className="w-80 border-r border-gray-100 p-8 shrink-0 bg-gray-50">
-          <h2 className="text-2xl font-semibold mb-8 text-gray-900">Content Tools</h2>
-          <div className="space-y-4">
-            {/* AI Generate Button */}
-            <button
-              onClick={() => handleModeChange('ai-generate')}
-              className={cn(
-                'w-full flex items-center gap-4 px-6 py-4 rounded-xl transition-colors text-lg',
-                mode === 'ai-generate'
-                  ? 'bg-blue-600 text-white'
-                  : 'hover:bg-gray-100 text-gray-700'
-              )}
-            >
-              <Wand2 className="h-7 w-7" />
-              AI-Powered
-            </button>
+      {/* Sidebar */}
+      <div className="w-80 border-r border-gray-100 p-8 shrink-0 bg-gray-50">
+        <h2 className="text-2xl font-semibold mb-8 text-gray-900">Content Tools</h2>
+        <div className="space-y-4">
+          {/* AI Generate Button */}
+          <button
+            onClick={() => handleModeChange('ai-generate')}
+            className={cn(
+              'w-full flex items-center gap-4 px-6 py-4 rounded-xl transition-colors text-lg',
+              mode === 'ai-generate'
+                ? 'bg-blue-600 text-white'
+                : 'hover:bg-gray-100 text-gray-700'
+            )}
+          >
+            <Wand2 className="h-7 w-7" />
+            AI-Powered
+          </button>
 
-            {/* Create Content Button */}
-            <button
-              onClick={() => {
-                setMode('create');
-                setShowStructured(false);
-              }}
-              className={cn(
-                'w-full flex items-center gap-4 px-6 py-4 rounded-xl transition-colors text-lg',
-                mode === 'create'
-                  ? 'bg-blue-600 text-white'
-                  : 'hover:bg-gray-100 text-gray-700'
-              )}
-            >
-              <Edit className="h-7 w-7" />
-              Smart Editor
-            </button>
+          {/* Create Content Button */}
+          <button
+            onClick={() => handleModeChange('create')}
+            className={cn(
+              'w-full flex items-center gap-4 px-6 py-4 rounded-xl transition-colors text-lg',
+              mode === 'create'
+                ? 'bg-blue-600 text-white'
+                : 'hover:bg-gray-100 text-gray-700'
+            )}
+          >
+            <Edit className="h-7 w-7" />
+            Smart Editor
+          </button>
 
-            {/* Analyze Content Button */}
-            <button
-              onClick={() => handleModeChange('analyze')}
-              className={cn(
-                'w-full flex items-center gap-4 px-6 py-4 rounded-xl transition-colors text-lg',
-                mode === 'analyze'
-                  ? 'bg-blue-600 text-white'
-                  : 'hover:bg-gray-100 text-gray-700'
-              )}
-            >
-              <FileSearch className="h-7 w-7" />
-              Deep Analysis
-            </button>
+          {/* Analyze Content Button */}
+          <button
+            onClick={() => handleModeChange('analyze')}
+            className={cn(
+              'w-full flex items-center gap-4 px-6 py-4 rounded-xl transition-colors text-lg',
+              mode === 'analyze'
+                ? 'bg-blue-600 text-white'
+                : 'hover:bg-gray-100 text-gray-700'
+            )}
+          >
+            <FileSearch className="h-7 w-7" />
+            Deep Analysis
+          </button>
 
-            {/* AI Score Button */}
-            <button
-              onClick={() => handleModeChange('ai-score')}
-              disabled={!hasContent}
-              className={cn(
-                'w-full flex items-center gap-4 px-6 py-4 rounded-xl transition-colors text-lg',
-                mode === 'ai-score'
-                  ? 'bg-blue-600 text-white'
-                  : hasContent
-                    ? 'hover:bg-gray-100 text-gray-700'
-                    : 'opacity-50 cursor-not-allowed text-gray-400'
-              )}
-            >
-              <Robot className="h-7 w-7" />
-              Realness Score
-            </button>
-          </div>
+          {/* AI Score Button */}
+          <button
+            onClick={() => handleModeChange('ai-score')}
+            disabled={!hasContent}
+            className={cn(
+              'w-full flex items-center gap-4 px-6 py-4 rounded-xl transition-colors text-lg',
+              mode === 'ai-score'
+                ? 'bg-blue-600 text-white'
+                : hasContent
+                  ? 'hover:bg-gray-100 text-gray-700'
+                  : 'opacity-50 cursor-not-allowed text-gray-400'
+            )}
+          >
+            <Robot className="h-7 w-7" />
+            Realness Score
+          </button>
         </div>
-      )}
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 p-10 overflow-hidden bg-gray-50">
@@ -262,54 +180,57 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Header - Only show when not in welcome screen */}
-          {!showWelcome && (
-            <div className="flex justify-between items-center mb-6">
-              <motion.h1
-                className="text-5xl font-bold text-gray-900"
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 10 }}
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <motion.h1
+              className="text-5xl font-bold text-gray-900"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 10 }}
+            >
+              ContentCraft Inspector
+            </motion.h1>
+
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setProfileMenuOpen((prev) => !prev)}
+                className="flex items-center gap-4 px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
               >
-                ContentCraft Inspector
-              </motion.h1>
+                <UserCircle className="h-7 w-7" />
+                Profile
+              </button>
 
-              <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => setProfileMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-4 px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
-                >
-                  <UserCircle className="h-7 w-7" />
-                  Profile
-                </button>
-
-                {profileMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                    <button
-                      onClick={handleShowProfile}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg"
-                    >
-                      <UserCircle className="h-5 w-5" />
-                      Show Profile
-                    </button>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-gray-100 rounded-b-lg"
-                    >
-                      <LogOut className="h-5 w-5" />
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
+              {profileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <button
+                    onClick={handleHistory}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg"
+                  >
+                    <History className="h-5 w-5" />
+                    History
+                  </button>
+                  <button
+                    onClick={handleShowProfile}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    <UserCircle className="h-5 w-5" />
+                    Show Profile
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-gray-100 rounded-b-lg"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Sign Out
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Content Area */}
           <div className="flex-1">
-            {showWelcome ? (
-              <WelcomeScreen />
-            ) : mode === 'ai-generate' && !hasGeneratedContent ? (
+            {mode === 'ai-generate' && !hasGeneratedContent ? (
               // Initial full-screen input view for AI Generate
               <div className="flex-1 flex items-center justify-center h-full">
                 <motion.div
@@ -372,10 +293,10 @@ export default function Home() {
                       </button>
                     </div>
                   </div>
-                 {/* Scrollable Content */}
-                 <div className="flex-1 p-6 overflow-auto" style={{ position: 'relative', overflowY: 'auto', scrollbarColor: '#3b82f6 #f3f4f6' }}>
+                  {/* Scrollable Content */}
+                  <div className="flex-1 p-6 overflow-auto" style={{ position: 'relative', overflowY: 'auto', scrollbarColor: '#bab9b9 #f0f0f0' }}>
                     <div className="prose max-w-none" style={{ position: 'absolute', paddingRight: '10px' }} dangerouslySetInnerHTML={{ __html: generatedContent }} />
-                  </div> 
+                  </div>
                   {/* Analysis/Score Panel */}
                   {(showAIGenerateAnalysis || showAIGenerateScore) && (
                     <div className="border-t border-gray-100 flex-1 overflow-hidden">
@@ -570,8 +491,8 @@ export default function Home() {
               </div>
             )}
           </div>
-        </motion.div >
-      </div >
-    </div >
+        </motion.div>
+      </div>
+    </div>
   );
 }

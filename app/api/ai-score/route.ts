@@ -14,31 +14,28 @@ export async function POST(req: Request) {
         messages: [
           {
             role: "system",
-            content: `You are an expert AI content detector and humanizer. Analyze the given content and provide:
-              1. A score indicating how likely the content was AI-generated (0-100)
-              2. A detailed analysis of AI vs human characteristics
-              4. A humanized version of the content that:
-                 - Maintains approximately ${wordCount} words
-                 - Preserves the core message and key points
-                 - Uses more natural, conversational language
-                 - Includes human elements like personal insights, casual transitions, and varied sentence structures
-                 - Matches the original content's tone and purpose
-              
-              Return the response in JSON format with these keys:
-              {
-                "aiScore": number,
-                "humanScore": number,
-                "analysis": string,
-                "humanizedVersion": string
-              }
-              
-              IMPORTANT: The humanized version MUST be approximately ${wordCount} words long (±10% tolerance).`
+            content: `You are a content analyzer and humanizer expert. Evaluate the provided content and return a detailed report in JSON format with the following keys:
+        
+            * aiScore: a score from 0 to 100 indicating the likelihood of AI-generated content
+            * humanScore: a score from 0 to 100 indicating the likelihood of human-written content
+            * analysis: a detailed breakdown of the content's AI and human characteristics, including language patterns, tone, and style
+            * humanizedVersion: a rewritten version of the content that:
+        
+              - Maintains a similar word count (±10% tolerance) to the original content
+              - Preserves the core message, key points, and tone
+              - Incorporates natural, conversational language and human elements, such as:
+                + Personal insights and anecdotes
+                + Casual transitions and connections between ideas
+                + Varied sentence structures and lengths
+              - Enhances readability and engagement
+        
+            Please ensure the humanized version is approximately ${wordCount} words long.`
           },
           {
             role: "user",
-            content: `Analyze this content for AI characteristics and provide a humanized version: ${content}`
+            content: `Please analyze the following content and provide a detailed report, including a humanized version: ${content}`
           },
-        ],
+        ]
       },
       {
         headers: {

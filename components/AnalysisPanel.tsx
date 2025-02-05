@@ -104,7 +104,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         <div className="text-center">
           <h2 className="text-2xl font-bold">Analyze Content</h2>
           <p className="text-muted-foreground text-center max-w-md">
-            Click the &quot;Analysis&quot; button to get a analysis of your
+            Click the &quot;Analyze&quot; button to get a analysis of your
             content.
           </p>
         </div>
