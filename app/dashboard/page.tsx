@@ -10,19 +10,17 @@ import { motion } from 'framer-motion';
 import { Edit, FileSearch, LogOut, Notebook as Robot, UserCircle, Wand2, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ContentEditor from '@/components/ContentEditor';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { logout } from '@/lib/user/appwrite';
 import AIGeneratePanel from '@/components/AIGeneratePanel';
+import DashboardParams from "@/components/DashboardParams";
 
 type AppMode = 'ai-generate' | 'create' | 'analyze' | 'ai-score';
 
 export default function Dashboard() {
-  const searchParams = useSearchParams();
-  const initialMode = searchParams.get('mode') as AppMode || 'ai-generate';
-
   // States
   const [content, setContent] = useState('');
-  const [mode, setMode] = useState<AppMode>(initialMode);
+  const [mode, setMode] = useState<AppMode>('ai-generate');
   const [showStructured, setShowStructured] = useState(false);
   const [triggerAnalysis, setTriggerAnalysis] = useState(false);
   const [triggerAIScore, setTriggerAIScore] = useState(false);
