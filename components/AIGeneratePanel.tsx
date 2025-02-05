@@ -65,6 +65,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
             onClick={generateContent}
             disabled={!title.trim() || loading}
             className="bg-blue-600 hover:bg-blue-700 text-white"
+            style={{height: '2.5rem'}}
           >
             {loading ? (
               <>

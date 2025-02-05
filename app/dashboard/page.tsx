@@ -13,7 +13,6 @@ import ContentEditor from '@/components/ContentEditor';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/lib/user/appwrite';
 import AIGeneratePanel from '@/components/AIGeneratePanel';
-import DashboardParams from "@/components/DashboardParams";
 
 type AppMode = 'ai-generate' | 'create' | 'analyze' | 'ai-score';
 
