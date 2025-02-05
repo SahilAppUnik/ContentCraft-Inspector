@@ -39,7 +39,7 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({
 
   const extractMainTopic = (text: string): string => {
     const words = text.split(/\s+/);
-    return words.slice(0, 3).join(' ');
+    return words.slice(0, 5).join(' ');
   };
 
   const fetchInfoGain = async (topic: string) => {

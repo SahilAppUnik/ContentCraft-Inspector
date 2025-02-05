@@ -157,12 +157,12 @@ body {
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #3b82f6;
+  background: #bab9b9;
   border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #2563eb;
+  background: #bab9b9;
 }
 
 h1, h2, h3 {

@@ -30,25 +30,23 @@ export async function POST(req: Request) {
       {
         role: "system",
         content:
-          "You are an AI assistant with knowledge of industry leaders, researchers, and experts across different fields.",
+          "You are an expert finder. Your task is to identify a credible expert, researcher, or authority on a specific topic. Provide the expert's name and a brief description of their expertise in the format: name: 'Name', description: 'Description'.",
       },
       {
         role: "user",
-        content: `Based on the topic "${title}", who is the most credible expert, researcher, or authority on this subject? Provide only the person's name and a brief description of their expertise. Give me only the name and description. format should be: name: "Name", description: "Description"`,
+        content: `Who is a leading expert in the field of "${title}"? Please provide their name and a brief description of their research focus and accomplishments.`,
       },
     ]);
-
-    console.log("Identified Expert:", expertResponse);
 
     // **Step 2: Use the identified expert in the next GPT call to generate content**
     const contentResponse = await callGPT([
       {
         role: "system",
-        content: `You are generating content with insights from ${expertResponse}. Use their expertise to craft a detailed, structured, and insightful response.`,
+        content: `You are a knowledgeable assistant. Your task is to generate a comprehensive, well-structured article on the topic "${title}".Include relevant headings, subheadings, paragraphs, and bullet points to make the content engaging and easy to understand.`,
       },
       {
         role: "user",
-        content: `Generate detailed, well-structured content for the following title: "${title}". Include appropriate headings, paragraphs, and relevant information.`,
+        content: `Generate a detailed, informative article with insights from "${expertResponse}". The article should have a clear structure, including an introduction, main sections, and a conclusion. Use bullet points and short paragraphs to make the content scannable and easy to read.`,
       },
     ]);
 

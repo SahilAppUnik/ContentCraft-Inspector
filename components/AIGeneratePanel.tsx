@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Wand2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { saveContent } from '@/lib/content/appwrite';
+import { getUser } from '@/lib/user/appwrite';
 
 interface AIGeneratePanelProps {
   onContentGenerated: (content: string) => void;
@@ -30,6 +31,14 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
       const data = await response.json();
       setGeneratedContent(data.content);
       onContentGenerated(data.content);
+
+      const sessionToken = localStorage.getItem('sessionToken');
+        if (!sessionToken) {
+          throw new Error('No session found');
+        }
+      const user = await getUser(sessionToken)   
+      
+      await saveContent(title, data.content, 'ai-generated', user.$id)
     } catch (error) {
       console.error('Error generating content:', error);
     } finally {

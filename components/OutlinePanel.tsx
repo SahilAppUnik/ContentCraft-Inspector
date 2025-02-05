@@ -84,7 +84,7 @@ const OutlinePanel: React.FC<OutlinePanelProps> = ({
         <div className="text-center">
           <h2 className="text-2xl font-bold">Content Outline</h2>
           <p className="text-muted-foreground text-center max-w-md">
-            Click the &quot;Outline&quot; button to get detailed insights about your content.
+            Click on &quot;Analyze&quot; button to get detailed insights about your content.
           </p>
         </div>
       </div>

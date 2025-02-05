@@ -63,7 +63,7 @@ export default function Signup() {
     try {
       const session = await signup(email, password, name);
       localStorage.setItem('sessionToken', session.secret);
-      router.push('/dashboard');
+      router.push('/home');
     } catch (error) {
       const errorMessage = (error as Error).message;
       if (errorMessage.includes('already exists')) {
