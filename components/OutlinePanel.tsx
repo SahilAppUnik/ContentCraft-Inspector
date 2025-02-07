@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { List, Lightbulb, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { saveContent, updateContent } from '@/lib/content/appwrite';
+import router from 'next/router';
+import { getUser } from '@/lib/user/appwrite';
 
 interface OutlinePanelProps {
   content: string;
@@ -47,6 +50,26 @@ const OutlinePanel: React.FC<OutlinePanelProps> = ({
         }
         const result = await response.json();
         setOutlineResult(result);
+        const documentId = localStorage.getItem('documentId')
+        if (documentId) {
+          await updateContent(documentId, {
+            input: content,
+            analysis: content,
+            outline: result.outline,
+            suggestions: result.suggestions,
+            contentGaps: result.contentGaps
+          });
+        } else {
+          const sessionToken = localStorage.getItem('sessionToken');
+          if (!sessionToken) {
+            router.push('/auth/login');
+            throw new Error('No session found');
+          }
+          const user = await getUser(sessionToken)
+          const res = await saveContent(content, user.$id, content, 'analyze', result.outline, result.suggestions, result.contentGaps)
+
+          localStorage.setItem('documentId', res.$id);
+        }
       } catch (error) {
         console.error('Error generating outline:', error);
         setError('Failed to generate outline. Please try again.');

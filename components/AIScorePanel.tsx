@@ -6,6 +6,9 @@ import { Progress } from '@/components/ui/progress';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
 import { Brain, RefreshCw, Sparkles, AlertTriangle } from 'lucide-react';
+import { saveContent, updateContent } from '@/lib/content/appwrite';
+import router from 'next/router';
+import { getUser } from '@/lib/user/appwrite';
 
 interface AIScorePanelProps {
   content: string;
@@ -51,7 +54,33 @@ const AIScorePanel: React.FC<AIScorePanelProps> = ({
         }
 
         const result = await response.json();
+        console.log('result', result);
+        
         setResult(result);
+
+        const documentId = localStorage.getItem('documentId')
+          if (documentId) {
+            const res = await updateContent(documentId, {
+              analysis: content,
+              input: content,
+              aiScore: result.aiScore,
+              humanScore: result.humanScore,
+              humanizedVersion: result.humanizedVersion
+            })
+            console.log('res', res);
+            setResult(res);
+            
+          } else {
+            const sessionToken = localStorage.getItem('sessionToken');
+            if (!sessionToken) {
+              router.push('/auth/login');
+              throw new Error('No session found');
+            }
+            const user = await getUser(sessionToken)
+            const res = await saveContent(content, user.$id, content, 'ai-score')
+
+            localStorage.setItem('documentId', res.$id);
+          }
       } catch (error) {
         console.error('Error checking AI score:', error);
         setError('Failed to analyze AI content. Please try again.');
@@ -163,7 +192,7 @@ const AIScorePanel: React.FC<AIScorePanelProps> = ({
                 </motion.div>
 
                 {/* Suggestions Section */}
-                {result.suggestions && result.suggestions.length > 0 && (
+                {/* {result.suggestions && result.suggestions.length > 0 && (
                   <motion.div
                     className="p-6 rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-200"
                     initial={{ y: 20, opacity: 0 }}
@@ -180,7 +209,7 @@ const AIScorePanel: React.FC<AIScorePanelProps> = ({
                       ))}
                     </ul>
                   </motion.div>
-                )}
+                )} */}
 
                 {/* Humanized Version Section */}
                 <motion.div

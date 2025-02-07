@@ -56,6 +56,7 @@ export default function HistoryPage() {
       try {
         const sessionToken = localStorage.getItem('sessionToken');
         if (!sessionToken) {
+          router.push('/auth/login');
           throw new Error('No session found');
         }
 
@@ -82,8 +83,16 @@ export default function HistoryPage() {
   }, [router, currentPage]);
 
   const handleViewDetails = (item: HistoryItem) => {
-    setSelectedItem(item);
-    setShowDetails(true);
+    const query = {
+      mode: item.mode,
+      content: item.content,
+      documentId: item.$id,
+      fromHistory: true,
+      analysis: item.analysis
+    };
+
+    localStorage.setItem('dashboardState', JSON.stringify(query));
+    router.push('/dashboard');
   };
 
   const handleDelete = async (documentId: string) => {
@@ -99,7 +108,7 @@ export default function HistoryPage() {
       const historyData = await fetchHistory(user?.$id || '', currentPage, ITEMS_PER_PAGE);
       setHistory(historyData?.documents || []);
       setTotalPages(Math.ceil((historyData?.total || 0) / ITEMS_PER_PAGE));
-      
+
       // If current page is empty and not the first page, go to previous page
       if (historyData.documents.length === 0 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -176,8 +185,8 @@ export default function HistoryPage() {
           <>
             <ul className="space-y-4">
               {history.map((item) => (
-                <li 
-                  key={item.$id} 
+                <li
+                  key={item.$id}
                   className="border p-4 rounded-lg shadow hover:shadow-md transition-shadow bg-white"
                 >
                   <div className="flex justify-between items-start mb-3">
@@ -198,9 +207,9 @@ export default function HistoryPage() {
                       Created: {new Date(item.createdAt).toLocaleString()}
                     </div>
                   </div>
-                  
+
                   <div className="prose max-w-none line-clamp-3 mb-3" dangerouslySetInnerHTML={{ __html: item.content }} />
-                  
+
                   {item.analysis && (
                     <div className="mb-3">
                       <p className="text-sm text-gray-600 font-medium">Analysis Summary:</p>
@@ -210,11 +219,11 @@ export default function HistoryPage() {
 
                   <div className="flex justify-between items-center mt-4">
                     <div className="text-sm text-gray-500">
-                      {item.updatedAt !== item.createdAt && 
+                      {item.updatedAt !== item.createdAt &&
                         `Updated: ${new Date(item.updatedAt).toLocaleString()}`
                       }
                     </div>
-                    <button 
+                    <button
                       className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                       onClick={() => handleViewDetails(item)}
                     >
@@ -229,7 +238,7 @@ export default function HistoryPage() {
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
+                    <PaginationPrevious
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                     />
@@ -246,7 +255,7 @@ export default function HistoryPage() {
                     </PaginationItem>
                   ))}
                   <PaginationItem>
-                    <PaginationNext 
+                    <PaginationNext
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                       className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                     />
@@ -283,15 +292,15 @@ export default function HistoryPage() {
               </div>
             )}
           </DialogHeader>
-          
+
           <div className="flex-1 overflow-auto mt-4">
             {selectedItem && (
               <div className="space-y-6">
                 <div className="prose max-w-none">
                   <h3 className="text-lg font-semibold mb-2">Input</h3>
-                  <div 
+                  <div
                     className="rounded-lg bg-white"
-                    dangerouslySetInnerHTML={{ __html: selectedItem.content }} 
+                    dangerouslySetInnerHTML={{ __html: selectedItem.content }}
                   />
                 </div>
 
