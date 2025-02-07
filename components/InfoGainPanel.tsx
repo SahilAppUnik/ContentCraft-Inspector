@@ -4,6 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Search, HelpCircle, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { saveContent, updateContent } from '@/lib/content/appwrite';
+import router from 'next/router';
+import { getUser } from '@/lib/user/appwrite';
 
 interface InfoGainPanelProps {
   content: string;
@@ -39,7 +42,7 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({
 
   const extractMainTopic = (text: string): string => {
     const words = text.split(/\s+/);
-    return words.slice(0, 5).join(' ');
+    return words.slice(0, 10).join(' ');
   };
 
   const fetchInfoGain = async (topic: string) => {
@@ -54,6 +57,26 @@ const InfoGainPanel: React.FC<InfoGainPanelProps> = ({
       });
       const data = await response.json();
       setTavilyData(data);
+
+      const documentId = localStorage.getItem('documentId')
+          if (documentId) {
+            await updateContent(documentId, {
+              input: content,
+              analysis: content,
+              summary: data.answer,
+              relatedLinks: data.results
+            })
+          } else {
+            const sessionToken = localStorage.getItem('sessionToken');
+            if (!sessionToken) {
+              router.push('/auth/login');
+              throw new Error('No session found');
+            }
+            const user = await getUser(sessionToken)
+            const res = await saveContent(content, user.$id, content, 'analyze', data.answer, data.results)
+
+            localStorage.setItem('documentId', res.$id);
+          }
     } catch (error) {
       console.error('Error fetching InfoGain results:', error);
     }

@@ -7,7 +7,7 @@ import OutlinePanel from '@/components/OutlinePanel';
 import InfoGainPanel from '@/components/InfoGainPanel';
 import AIScorePanel from '@/components/AIScorePanel';
 import { motion } from 'framer-motion';
-import { Edit, FileSearch, LogOut, Notebook as Robot, UserCircle, Wand2, History } from 'lucide-react';
+import { Edit, FileSearch, LogOut, Notebook as Robot, UserCircle, Wand2, History, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ContentEditor from '@/components/ContentEditor';
 import { useRouter } from 'next/navigation';
@@ -29,11 +29,17 @@ export default function Dashboard() {
   const [showAIGenerateAnalysis, setShowAIGenerateAnalysis] = useState(false);
   const [showAIGenerateScore, setShowAIGenerateScore] = useState(false);
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
+  const [documentId, setDocumentId] = useState<string | null>(null);
+  const [fromHistory, setFromHistory] = useState(false);
 
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
   const hasContent = content.trim().length > 0 || generatedContent.trim().length > 0;
+
+  useEffect(() => {
+    localStorage.removeItem("documentId");
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,6 +56,59 @@ export default function Dashboard() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [profileMenuOpen]);
+
+  useEffect(() => {
+    const loadHistoryState = () => {
+      const savedState = localStorage.getItem('dashboardState');
+      if (savedState) {
+        const { mode, content, documentId, fromHistory, analysis } = JSON.parse(savedState);
+        
+        setMode(mode as AppMode);
+        setContent(content);
+        setDocumentId(documentId);
+        setFromHistory(true);
+        
+        switch (mode) {
+          case 'analyze':
+            setTriggerAnalysis(true);
+            setShowStructured(true);
+            break;
+            
+          case 'ai-score':
+            setTriggerAIScore(true);
+            setShowStructured(true);
+            break;
+            
+          case 'ai-generate':
+            setGeneratedContent(content);
+            setHasGeneratedContent(true);
+            break;
+            
+          case 'create':
+            setShowStructured(true);
+            break;
+        }
+        
+        localStorage.removeItem('dashboardState');
+      }
+    };
+  
+    loadHistoryState();
+  }, []);
+
+  const BackToHistoryButton = () => {
+    if (!fromHistory) return null;
+    
+    return (
+      <button
+        onClick={() => router.push('/history')}
+        className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900"
+      >
+        <ArrowLeft className="h-5 w-5" />
+        Back to History
+      </button>
+    );
+  };
 
   const handleLogout = async () => {
     try {
@@ -79,7 +138,7 @@ export default function Dashboard() {
 
   const handleModeChange = (newMode: AppMode) => {
     setMode(newMode);
-    router.push(`/dashboard?mode=${newMode}`);
+    router.push(`/dashboard?mode=${newMode}${documentId ? `&documentId=${documentId}` : ''}`);
     setShowStructured(false);
     setTriggerAnalysis(false);
     setTriggerAIScore(false);
@@ -105,9 +164,10 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen h-screen flex bg-white">
       {/* Sidebar */}
-      <div className="w-80 border-r border-gray-100 p-8 shrink-0 bg-gray-50">
+      <div className="w-80 border-r border-gray-100 p-8 shrink-0 bg-gray-50 flex flex-col h-screen">
         <h2 className="text-2xl font-semibold mb-8 text-gray-900">Content Tools</h2>
-        <div className="space-y-4">
+
+        <div className="space-y-4 flex-grow">
           {/* AI Generate Button */}
           <button
             onClick={() => handleModeChange('ai-generate')}
@@ -166,6 +226,17 @@ export default function Dashboard() {
             <Robot className="h-7 w-7" />
             Realness Score
           </button>
+
+          {/* History Button at Bottom & Centered */}
+          <div className="flex flex-col items-center mt-auto">
+            <button
+              onClick={handleHistory}
+              className="w-full flex items-center gap-4 px-6 py-4 rounded-xl transition-colors text-lg hover:bg-gray-100 text-gray-700"
+            >
+              <History className="h-7 w-7" />
+              History
+            </button>
+          </div>
         </div>
       </div>
 
@@ -179,6 +250,8 @@ export default function Dashboard() {
         >
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-4">
+          <BackToHistoryButton />
             <motion.h1
               className="text-5xl font-bold text-gray-900"
               initial={{ scale: 0.9 }}
@@ -187,6 +260,7 @@ export default function Dashboard() {
             >
               ContentCraft Inspector
             </motion.h1>
+            </div>
 
             <div className="relative" ref={menuRef}>
               <button
@@ -199,13 +273,6 @@ export default function Dashboard() {
 
               {profileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                  <button
-                    onClick={handleHistory}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg"
-                  >
-                    <History className="h-5 w-5" />
-                    History
-                  </button>
                   <button
                     onClick={handleShowProfile}
                     className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100"

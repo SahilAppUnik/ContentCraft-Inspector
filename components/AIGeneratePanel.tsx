@@ -16,7 +16,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
 
   const generateContent = async () => {
     if (!title.trim()) return;
-    
+
     setLoading(true);
     try {
       // Replace with your actual GPT API call
@@ -27,18 +27,25 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
         },
         body: JSON.stringify({ title }),
       });
-      
+
       const data = await response.json();
       setGeneratedContent(data.content);
       onContentGenerated(data.content);
 
       const sessionToken = localStorage.getItem('sessionToken');
-        if (!sessionToken) {
-          throw new Error('No session found');
-        }
-      const user = await getUser(sessionToken)   
-      
-      await saveContent(title, data.content, 'ai-generated', user.$id)
+      if (!sessionToken) {
+        throw new Error('No session found');
+      }
+      const user = await getUser(sessionToken)
+
+      const res = await saveContent(title, user.$id, data.content, 'ai-generate',)
+      const existingDocumentId = localStorage.getItem('documentId');
+      if (existingDocumentId) {
+        localStorage.removeItem('documentId');
+        localStorage.setItem('documentId', res.$id);
+      } else {
+        localStorage.setItem('documentId', res.$id);
+      }
     } catch (error) {
       console.error('Error generating content:', error);
     } finally {
@@ -65,7 +72,7 @@ export default function AIGeneratePanel({ onContentGenerated }: AIGeneratePanelP
             onClick={generateContent}
             disabled={!title.trim() || loading}
             className="bg-blue-600 hover:bg-blue-700 text-white"
-            style={{height: '2.5rem'}}
+            style={{ height: '2.5rem' }}
           >
             {loading ? (
               <>

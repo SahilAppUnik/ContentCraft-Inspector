@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, Type, Clock, Zap } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { saveContent, updateContent } from '@/lib/content/appwrite'
+import { getUser } from '@/lib/user/appwrite'
+import router from 'next/router'
 
 interface AnalysisPanelProps {
   content: string
@@ -62,6 +65,32 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
             keyInsights: result.keyInsights || [],
             improvements: result.improvements || [],
           })
+
+          const documentId = localStorage.getItem('documentId')
+          if (documentId) {
+            await updateContent(documentId, {
+              input: content,
+              analysis: content,
+              contentScore: result.contentScore,
+              readability: result.readability,
+              tone: result.tone,
+              keyInsights: result.keyInsights,
+              improvements: result.improvements,
+              wordCount: wordCount,
+              readingTime: readingTime
+            })
+          } else {
+            const sessionToken = localStorage.getItem('sessionToken');
+            if (!sessionToken) {
+              router.push('/auth/login');
+              throw new Error('No session found');
+            }
+            const user = await getUser(sessionToken)
+            console.log(user);
+            const res = await saveContent(content, user.$id, content, 'analyze', result.contentScore, result.readability, result.tone, result.keyInsights, result.improvements, wordCount, readingTime)
+
+            localStorage.setItem('documentId', res.$id);
+          }
         } catch (error) {
           console.error('Error analyzing content:', error)
           setError(
@@ -115,165 +144,165 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   return (
     <div className="h-full flex flex-col relative">
       <div className="absolute inset-0 overflow-y-auto">
-      <div className="p-6 space-y-6">
-      <motion.div
-        className="flex-1 overflow-y-auto p-6 space-y-6 pr-4"
-        style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: '#3b82f6 #f3f4f6',
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50">
-          <CardHeader className="bg-white border-b border-gray-100 sticky top-0 z-10">
-            <CardTitle className="flex items-center text-xl text-gray-900">
-              <Zap className="mr-2 text-blue-600" />
-              Content Score
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-center">
-              <motion.div
-                className="relative w-48 h-48"
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 10 }}
-              >
-                <svg className="w-full h-full" viewBox="0 0 100 100">
-                  {/* Define the gradient */}
-                  <defs>
-                    <linearGradient
-                      id="scoreGradient"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%"
+        <div className="p-6 space-y-6">
+          <motion.div
+            className="flex-1 overflow-y-auto p-6 space-y-6 pr-4"
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#3b82f6 #f3f4f6',
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50">
+              <CardHeader className="bg-white border-b border-gray-100 sticky top-0 z-10">
+                <CardTitle className="flex items-center text-xl text-gray-900">
+                  <Zap className="mr-2 text-blue-600" />
+                  Content Score
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-center">
+                  <motion.div
+                    className="relative w-48 h-48"
+                    initial={{ scale: 0.9 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 10 }}
+                  >
+                    <svg className="w-full h-full" viewBox="0 0 100 100">
+                      {/* Define the gradient */}
+                      <defs>
+                        <linearGradient
+                          id="scoreGradient"
+                          x1="0%"
+                          y1="0%"
+                          x2="100%"
+                          y2="0%"
+                        >
+                          <stop
+                            offset="0%"
+                            style={{ stopColor: '#3b82f6', stopOpacity: 1 }}
+                          />
+                          <stop
+                            offset="100%"
+                            style={{ stopColor: '#60a5fa', stopOpacity: 1 }}
+                          />
+                        </linearGradient>
+                      </defs>
+
+                      {/* Background circle */}
+                      <circle
+                        className="text-gray-200"
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        fill="transparent"
+                        strokeWidth="8"
+                        stroke="currentColor"
+                      />
+
+                      {/* Score circle */}
+                      <motion.circle
+                        stroke="url(#scoreGradient)"
+                        strokeWidth="8"
+                        strokeLinecap="round"
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        fill="transparent"
+                        transform="rotate(-90 50 50)"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: analysis.contentScore / 100 }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                      />
+                    </svg>
+
+                    {/* Score text */}
+                    <motion.div
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-bold text-gray-900"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
                     >
-                      <stop
-                        offset="0%"
-                        style={{ stopColor: '#3b82f6', stopOpacity: 1 }}
-                      />
-                      <stop
-                        offset="100%"
-                        style={{ stopColor: '#60a5fa', stopOpacity: 1 }}
-                      />
-                    </linearGradient>
-                  </defs>
+                      {Math.round(analysis.contentScore)}
+                    </motion.div>
+                  </motion.div>
+                </div>
+              </CardContent>
+            </Card>
 
-                  {/* Background circle */}
-                  <circle
-                    className="text-gray-200"
-                    cx="50"
-                    cy="50"
-                    r="40"
-                    fill="transparent"
-                    strokeWidth="8"
-                    stroke="currentColor"
-                  />
-
-                  {/* Score circle */}
-                  <motion.circle
-                    stroke="url(#scoreGradient)"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                    cx="50"
-                    cy="50"
-                    r="40"
-                    fill="transparent"
-                    transform="rotate(-90 50 50)"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: analysis.contentScore / 100 }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                  />
-                </svg>
-
-                {/* Score text */}
-                <motion.div
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-bold text-gray-900"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  {Math.round(analysis.contentScore)}
-                </motion.div>
-              </motion.div>
+            <div className="grid grid-cols-2 gap-4">
+              <MetricCard icon={<Type />} label="Word Count" value={wordCount} />
+              <MetricCard
+                icon={<Clock />}
+                label="Reading Time"
+                value={`${readingTime} min`}
+              />
+              <MetricCard
+                icon={<Type />}
+                label="Readability"
+                value={`${Math.round(analysis.readability)}%`}
+              />
+              <MetricCard
+                icon={<AlertCircle />}
+                label="Tone"
+                value={analysis.tone}
+              />
             </div>
-          </CardContent>
-        </Card>
 
-        <div className="grid grid-cols-2 gap-4">
-          <MetricCard icon={<Type />} label="Word Count" value={wordCount} />
-          <MetricCard
-            icon={<Clock />}
-            label="Reading Time"
-            value={`${readingTime} min`}
-          />
-          <MetricCard
-            icon={<Type />}
-            label="Readability"
-            value={`${Math.round(analysis.readability)}%`}
-          />
-          <MetricCard
-            icon={<AlertCircle />}
-            label="Tone"
-            value={analysis.tone}
-          />
+            <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50">
+              <CardHeader className="bg-white border-b border-gray-100 sticky top-0 z-10">
+                <CardTitle className="flex items-center text-xl text-gray-900">
+                  <AlertCircle className="mr-2 text-blue-600" />
+                  Key Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <ul className="space-y-4">
+                  {analysis.keyInsights.map((insight, index) => (
+                    <motion.li
+                      key={index}
+                      className="flex items-start gap-3 text-base border-b border-gray-200 pb-3 last:border-0 last:pb-0"
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <span className="text-blue-500 mt-1">•</span>
+                      <span className="text-gray-700">{insight}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50">
+              <CardHeader className="bg-white border-b border-gray-100 sticky top-0 z-10">
+                <CardTitle className="flex items-center text-xl text-gray-900">
+                  <Zap className="mr-2 text-blue-600" />
+                  Suggested Improvements
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <ul className="space-y-4">
+                  {analysis.improvements.map((improvement, index) => (
+                    <motion.li
+                      key={index}
+                      className="flex items-start gap-3 text-base border-b border-gray-200 pb-3 last:border-0 last:pb-0"
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <span className="text-blue-500 mt-1">•</span>
+                      <span className="text-gray-700">{improvement}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
-
-        <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50">
-          <CardHeader className="bg-white border-b border-gray-100 sticky top-0 z-10">
-            <CardTitle className="flex items-center text-xl text-gray-900">
-              <AlertCircle className="mr-2 text-blue-600" />
-              Key Insights
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <ul className="space-y-4">
-              {analysis.keyInsights.map((insight, index) => (
-                <motion.li
-                  key={index}
-                  className="flex items-start gap-3 text-base border-b border-gray-200 pb-3 last:border-0 last:pb-0"
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <span className="text-blue-500 mt-1">•</span>
-                  <span className="text-gray-700">{insight}</span>
-                </motion.li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50">
-          <CardHeader className="bg-white border-b border-gray-100 sticky top-0 z-10">
-            <CardTitle className="flex items-center text-xl text-gray-900">
-              <Zap className="mr-2 text-blue-600" />
-              Suggested Improvements
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <ul className="space-y-4">
-              {analysis.improvements.map((improvement, index) => (
-                <motion.li
-                  key={index}
-                  className="flex items-start gap-3 text-base border-b border-gray-200 pb-3 last:border-0 last:pb-0"
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <span className="text-blue-500 mt-1">•</span>
-                  <span className="text-gray-700">{improvement}</span>
-                </motion.li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
-    </div>
+      </div>
     </div>
   )
 }

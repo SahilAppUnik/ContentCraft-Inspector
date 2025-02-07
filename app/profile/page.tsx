@@ -33,6 +33,7 @@ export default function ProfilePage() {
       try {
         const sessionToken = localStorage.getItem('sessionToken');
         if (!sessionToken) {
+          router.push('/auth/login');
           throw new Error('No session found');
         }
 
@@ -79,6 +80,7 @@ export default function ProfilePage() {
       setError(null);
       const sessionToken = localStorage.getItem('sessionToken');
       if (!sessionToken) {
+        router.push('/auth/login');
         throw new Error('No session token found.');
       }
 
