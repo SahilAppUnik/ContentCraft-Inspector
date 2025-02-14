@@ -48,12 +48,18 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^0.2.0",
+    "docx": "^9.1.1",
     "dotenv": "^16.4.7",
     "embla-carousel-react": "^8.0.0-rc19",
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.1",
+    "file-saver": "^2.0.5",
     "framer-motion": "^10.18.0",
+    "fs": "^0.0.1-security",
+    "html-to-docx": "^1.8.0",
+    "html2canvas": "^1.4.1",
     "input-otp": "^1.0.1",
+    "jspdf": "^2.5.2",
     "lucide-react": "^0.312.0",
     "next": "^15.1.6",
     "next-themes": "^0.2.1",
@@ -63,9 +69,13 @@
     "react-day-picker": "^8.10.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.49.3",
+    "react-markdown": "^9.0.3",
     "react-quill": "^2.0.0",
     "react-resizable-panels": "^1.0.9",
     "recharts": "^2.15.0",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-html": "^16.0.1",
     "sonner": "^1.3.1",
     "tailwind-merge": "^2.2.0",
     "tailwindcss": "3.3.3",
@@ -74,6 +84,8 @@
     "vaul": "^0.8.0"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "@types/html-docx-js": "^0.3.4",
     "@types/quill": "^2.0.14"
   }
 }

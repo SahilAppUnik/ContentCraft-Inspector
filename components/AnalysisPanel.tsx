@@ -86,9 +86,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
               throw new Error('No session found');
             }
             const user = await getUser(sessionToken)
-            console.log(user);
             const res = await saveContent(content, user.$id, content, 'analyze', result.contentScore, result.readability, result.tone, result.keyInsights, result.improvements, wordCount, readingTime)
-
             localStorage.setItem('documentId', res.$id);
           }
         } catch (error) {
