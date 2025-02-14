@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchHistory, deleteHistoryItem } from "@/lib/content/appwrite";
+import { fetchHistory, deleteHistoryItem, fetchContent } from "@/lib/content/appwrite";
 import { getUser } from "@/lib/user/appwrite";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -26,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 interface HistoryItem {
   $id: string;
@@ -49,7 +50,7 @@ export default function HistoryPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 3;
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -82,18 +83,25 @@ export default function HistoryPage() {
     fetchProfile();
   }, [router, currentPage]);
 
-  const handleViewDetails = (item: HistoryItem) => {
-    const query = {
-      mode: item.mode,
-      content: item.content,
-      documentId: item.$id,
-      fromHistory: true,
-      analysis: item.analysis
-    };
-
-    localStorage.setItem('dashboardState', JSON.stringify(query));
-    router.push('/dashboard');
-  };
+  const handleViewDetails = async (item: HistoryItem) => {
+    try {
+      const contentData = await fetchContent(item.$id); // Fetch full content
+  
+      const query = {
+        id: item.$id,
+        mode: item.mode, // Ensure mode is passed correctly
+        content: contentData?.document?.content || item.content,
+        documentId: item.$id,
+        fromHistory: true,
+        analysis: contentData?.document?.analysis || item.analysis,
+      };
+  
+      localStorage.setItem('dashboardState', JSON.stringify(query)); // Store data
+      router.push('/dashboard'); // Redirect to dashboard
+    } catch (error) {
+      console.error("Error fetching content details:", error);
+    }
+  };  
 
   const handleDelete = async (documentId: string) => {
     setItemToDelete(documentId);
@@ -107,6 +115,7 @@ export default function HistoryPage() {
       await deleteHistoryItem(itemToDelete);
       const historyData = await fetchHistory(user?.$id || '', currentPage, ITEMS_PER_PAGE);
       setHistory(historyData?.documents || []);
+      
       setTotalPages(Math.ceil((historyData?.total || 0) / ITEMS_PER_PAGE));
 
       // If current page is empty and not the first page, go to previous page
@@ -120,7 +129,7 @@ export default function HistoryPage() {
       setShowDeleteAlert(false);
       setItemToDelete(null);
     }
-  };
+  };  
 
   const getModeColor = (mode: HistoryItem['mode']) => {
     const colors = {
@@ -208,11 +217,15 @@ export default function HistoryPage() {
                     </div>
                   </div>
 
-                  <div className="prose max-w-none line-clamp-3 mb-3" dangerouslySetInnerHTML={{ __html: item.content }} />
+                  <div className="prose max-w-none line-clamp-3 mb-3">
+                  <MarkdownRenderer content={selectedItem?.content ?? ""}  />
+                  </div>
 
                   {item.analysis && (
                     <div className="mb-3">
-                      <p className="text-sm text-gray-600 font-medium">Analysis Summary:</p>
+                      <p className="text-sm text-gray-600 font-medium">Input:</p>
+                      <div className="text-sm text-gray-500 line-clamp-2">{item.content}</div>
+                      <p className="text-sm text-gray-600 font-medium">Analysis:</p>
                       <div className="text-sm text-gray-500 line-clamp-2">{item.analysis}</div>
                     </div>
                   )}
@@ -271,52 +284,39 @@ export default function HistoryPage() {
 
       {/* Details Modal */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
-          <DialogHeader className="flex-shrink-0">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <DialogTitle>Content Details</DialogTitle>
-                {selectedItem && (
-                  <Badge className={`mt-2 ${getModeColor(selectedItem.mode)}`}>
-                    {getModeLabel(selectedItem.mode)}
-                  </Badge>
-                )}
-              </div>
-            </div>
-            {selectedItem && (
-              <div className="space-y-1 text-sm text-gray-500">
-                <p>Created: {new Date(selectedItem.createdAt).toLocaleString()}</p>
-                {selectedItem.updatedAt !== selectedItem.createdAt && (
-                  <p>Updated: {new Date(selectedItem.updatedAt).toLocaleString()}</p>
-                )}
-              </div>
-            )}
-          </DialogHeader>
+  <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+    <DialogHeader className="flex-shrink-0">
+      <DialogTitle>Content Details</DialogTitle>
+      {selectedItem && (
+        <Badge className={`mt-2 ${getModeColor(selectedItem.mode)}`}>
+          {getModeLabel(selectedItem.mode)}
+        </Badge>
+      )}
+    </DialogHeader>
 
-          <div className="flex-1 overflow-auto mt-4">
-            {selectedItem && (
-              <div className="space-y-6">
-                <div className="prose max-w-none">
-                  <h3 className="text-lg font-semibold mb-2">Input</h3>
-                  <div
-                    className="rounded-lg bg-white"
-                    dangerouslySetInnerHTML={{ __html: selectedItem.content }}
-                  />
-                </div>
-
-                {selectedItem.analysis && (
-                  <div className="prose max-w-none">
-                    <h3 className="text-lg font-semibold mb-2">Analysis</h3>
-                    <div className="rounded-lg bg-gray-50 p-4">
-                      {selectedItem.analysis}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+    <div className="flex-1 overflow-auto mt-4">
+      {!selectedItem ? (
+        <div className="flex justify-center items-center py-6">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="prose max-w-none">
+            <h3 className="text-lg font-semibold mb-2">Input</h3>
+            <MarkdownRenderer content={selectedItem.content} />
           </div>
-        </DialogContent>
-      </Dialog>
+
+          {selectedItem.analysis && (
+            <div className="prose max-w-none">
+              <h3 className="text-lg font-semibold mb-2">Analysis</h3>
+              <div className="rounded-lg bg-gray-50 p-4">{selectedItem.analysis}</div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  </DialogContent>
+</Dialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>

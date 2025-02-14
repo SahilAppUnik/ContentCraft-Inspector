@@ -77,14 +77,14 @@ export async function fetchHistory(userId: string, page: number, limit: number) 
     
     const queryParams = {
       queries: JSON.stringify([`equal("userId", "${userId}")`]),
-      orderAttributes: JSON.stringify(["createdAt"]),
-      orderTypes: JSON.stringify(["DESC"]),
       limit: limit.toString(),
-      offset: offset.toString()
+      offset: offset.toString(),
+      orderAttributes: '["createdAt"]',
+      orderTypes: '["DESC"]',
     }
 
     const response = await fetch(
-      `${process.env.APPWRITE_ENDPOINT}/databases/${process.env.APPWRITE_DATABASE_ID}/collections/${process.env.APPWRITE_CONTENT_COLLECTION_ID}/documents?${queryParams}`,
+      `${process.env.APPWRITE_ENDPOINT}/databases/${process.env.APPWRITE_DATABASE_ID}/collections/${process.env.APPWRITE_CONTENT_COLLECTION_ID}/documents`,
       {
         method: "GET",
         headers: {
@@ -95,6 +95,7 @@ export async function fetchHistory(userId: string, page: number, limit: number) 
     );
     
     if (!response.ok) throw new Error("Failed to fetch history");
+    // console.log('res', await response.json());
     
     return await response.json();
   } catch (error) {
@@ -209,5 +210,27 @@ export async function updateContent (
     return await response.json();
   } catch (error) {
     console.error("Error saving content:", error);
+  }
+}
+
+export async function fetchContent(documentId: string) {
+  try {
+    const response = await fetch(
+      `${process.env.APPWRITE_ENDPOINT}/databases/${process.env.APPWRITE_DATABASE_ID}/collections/${process.env.APPWRITE_CONTENT_COLLECTION_ID}/documents/${documentId}`,
+      {
+        method: "GET",
+        headers: {
+          "X-Appwrite-Project": process.env.APPWRITE_PROJECT_ID ?? "",
+          "X-Appwrite-Key": process.env.API_SECRET_KEY ?? "",
+        }
+      }
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch content");
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching content:", error);
+    throw error;
   }
 }

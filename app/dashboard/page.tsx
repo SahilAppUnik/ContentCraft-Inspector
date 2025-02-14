@@ -13,12 +13,16 @@ import ContentEditor from '@/components/ContentEditor';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/lib/user/appwrite';
 import AIGeneratePanel from '@/components/AIGeneratePanel';
+import { Document, HeadingLevel, Packer, Paragraph, TextRun } from 'docx';
+import { saveAs } from 'file-saver';
+import MarkdownRenderer, { getDownloadableContent } from '@/components/MarkdownRenderer';
 
 type AppMode = 'ai-generate' | 'create' | 'analyze' | 'ai-score';
 
 export default function Dashboard() {
   // States
   const [content, setContent] = useState('');
+  const [analysis, setAnalysis] = useState('');
   const [mode, setMode] = useState<AppMode>('ai-generate');
   const [showStructured, setShowStructured] = useState(false);
   const [triggerAnalysis, setTriggerAnalysis] = useState(false);
@@ -31,6 +35,7 @@ export default function Dashboard() {
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [fromHistory, setFromHistory] = useState(false);
+  const [title, setTitle] = useState<string>('GeneratedContent');
 
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -60,36 +65,41 @@ export default function Dashboard() {
   useEffect(() => {
     const loadHistoryState = () => {
       const savedState = localStorage.getItem('dashboardState');
+      console.log('savedState', savedState);
+      
       if (savedState) {
-        const { mode, content, documentId, fromHistory, analysis } = JSON.parse(savedState);
-        
-        setMode(mode as AppMode);
+        const { id, mode, content, documentId, fromHistory, analysis } = JSON.parse(savedState);
+  
+        setMode(mode as AppMode); // Set the mode dynamically
         setContent(content);
+        setAnalysis(analysis)
         setDocumentId(documentId);
         setFromHistory(true);
-        
+  
         switch (mode) {
           case 'analyze':
             setTriggerAnalysis(true);
             setShowStructured(true);
+            setAnalysis(analysis);
             break;
-            
+  
           case 'ai-score':
             setTriggerAIScore(true);
             setShowStructured(true);
+            setAnalysis(analysis);
             break;
-            
+  
           case 'ai-generate':
-            setGeneratedContent(content);
+            setGeneratedContent(analysis);
             setHasGeneratedContent(true);
+            setAnalysis(analysis);
             break;
-            
+  
           case 'create':
             setShowStructured(true);
             break;
         }
-        
-        localStorage.removeItem('dashboardState');
+        localStorage.removeItem('dashboardState'); // Remove data after loading
       }
     };
   
@@ -98,7 +108,7 @@ export default function Dashboard() {
 
   const BackToHistoryButton = () => {
     if (!fromHistory) return null;
-    
+
     return (
       <button
         onClick={() => router.push('/history')}
@@ -159,6 +169,55 @@ export default function Dashboard() {
     setGeneratedContent(generatedContent);
     setContent(generatedContent);
     setHasGeneratedContent(true);
+    setTitle(generatedContent.split('\n')[0] || 'GeneratedContent');
+  };
+
+  const downloadAsWord = () => {
+    if (!generatedContent.trim()) return;
+  
+    // Convert Markdown to structured text
+    const formattedContent = getDownloadableContent(generatedContent, 'docx');
+  
+    const doc = new Document({
+      sections: [
+        {
+          children: formattedContent.split('\n').map((line) => {
+            if (line.startsWith('--- ')) {
+              return new Paragraph({
+                text: line.replace('--- ', ''),
+                heading: HeadingLevel.HEADING_1,
+              });
+            } else if (line.startsWith('-- ')) {
+              return new Paragraph({
+                text: line.replace('-- ', ''),
+                heading: HeadingLevel.HEADING_2,
+              });
+            } else if (line.startsWith('- ')) {
+              return new Paragraph({
+                text: line.replace('- ', ''),
+                heading: HeadingLevel.HEADING_3,
+              });
+            } else if (line.startsWith('• ')) {
+              return new Paragraph({
+                children: [new TextRun(line.replace('• ', ''))],
+                bullet: { level: 0 },
+              });
+            } else if (line.startsWith('1. ')) {
+              return new Paragraph({
+                children: [new TextRun(line.replace('1. ', ''))],
+                numbering: { reference: "ordered-list", level: 0 },
+              });
+            } else {
+              return new Paragraph(line);
+            }
+          }),
+        },
+      ],
+    });
+  
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, `${title || 'GeneratedContent'}.docx`);
+    });
   };
 
   return (
@@ -250,16 +309,16 @@ export default function Dashboard() {
         >
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
-          <BackToHistoryButton />
-            <motion.h1
-              className="text-5xl font-bold text-gray-900"
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 10 }}
-            >
-              ContentCraft Inspector
-            </motion.h1>
+            <div className="flex items-center gap-4">
+              <BackToHistoryButton />
+              <motion.h1
+                className="text-5xl font-bold text-gray-900"
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 10 }}
+              >
+                ContentCraft Inspector
+              </motion.h1>
             </div>
 
             <div className="relative" ref={menuRef}>
@@ -355,11 +414,19 @@ export default function Dashboard() {
                         <Robot className="h-5 w-5" />
                         AI Score
                       </button>
+                      <button
+                        onClick={downloadAsWord}
+                        className="gap-2 px-4 py-2 rounded-lg flex items-center bg-green-600 text-white hover:bg-green-700"
+                      >
+                        📄 Download as Word
+                      </button>
                     </div>
                   </div>
                   {/* Scrollable Content */}
                   <div className="flex-1 p-6 overflow-auto" style={{ position: 'relative', overflowY: 'auto', scrollbarColor: '#bab9b9 #f0f0f0' }}>
-                    <div className="prose max-w-none" style={{ position: 'absolute', paddingRight: '10px' }} dangerouslySetInnerHTML={{ __html: generatedContent }} />
+                    <div className="prose max-w-none" style={{ position: 'absolute', paddingRight: '10px' }}>
+                      <MarkdownRenderer content={generatedContent} />
+                    </div>
                   </div>
                   {/* Analysis/Score Panel */}
                   {(showAIGenerateAnalysis || showAIGenerateScore) && (
@@ -403,7 +470,7 @@ export default function Dashboard() {
                   className="bg-white rounded-2xl border border-gray-100 shadow-lg h-full overflow-hidden"
                 >
                   <ContentEditor
-                    initialContent={content}
+                    initialContent={analysis}
                     onContentChange={setContent}
                     mode={mode}
                     onCreate={() => setShowStructured(true)}
@@ -423,7 +490,7 @@ export default function Dashboard() {
                   className="bg-white rounded-2xl border border-gray-100 shadow-lg h-[calc(100vh-200px)] overflow-hidden"
                 >
                   <ContentEditor
-                    initialContent={content}
+                    initialContent={generatedContent}
                     onContentChange={setContent}
                     mode={mode}
                     onCreate={() => setShowStructured(true)}
@@ -479,19 +546,19 @@ export default function Dashboard() {
                       >
                         <TabsContent value="analysis" className="h-full m-0 p-4 overflow-auto">
                           <AnalysisPanel
-                            content={content}
+                            content={analysis}
                             triggerAnalysis={triggerAnalysis}
                           />
                         </TabsContent>
                         <TabsContent value="outline" className="h-full m-0 p-4 overflow-auto">
                           <OutlinePanel
-                            content={content}
+                            content={analysis}
                             triggerOutline={triggerAnalysis}
                           />
                         </TabsContent>
                         <TabsContent value="infogain" className="h-full m-0 p-4 overflow-auto">
                           <InfoGainPanel
-                            content={content}
+                            content={analysis}
                             triggerInfoGain={triggerAnalysis}
                           />
                         </TabsContent>
@@ -526,12 +593,11 @@ export default function Dashboard() {
                             </button>
                           </div>
                         </div>
-                        <div className="flex-1 p-6 overflow-auto">
-                          <div
-                            className="prose max-w-none"
-                            dangerouslySetInnerHTML={{ __html: content }}
-                          />
-                        </div>
+                        <div className="flex-1 p-6 overflow-auto" style={{ position: 'relative', overflowY: 'auto', scrollbarColor: '#bab9b9 #f0f0f0' }}>
+                    <div className="prose max-w-none" style={{ position: 'absolute', paddingRight: '10px' }}>
+                    <MarkdownRenderer content={analysis} />
+                    </div>
+                </div>
                       </div>
                     </motion.div>
                   )}
@@ -545,7 +611,7 @@ export default function Dashboard() {
                     >
                       <div className="p-4 h-full overflow-auto">
                         <AIScorePanel
-                          content={content}
+                          content={analysis}
                           triggerAIScore={triggerAIScore}
                         />
                       </div>

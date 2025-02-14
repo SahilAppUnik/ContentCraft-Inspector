@@ -1,9 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileSearch, Bot } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface StructuredViewProps {
-  content: string;
+  content: string; // HTML content
   onAnalyze: () => void;
   onAIScore: () => void;
 }
@@ -19,14 +22,14 @@ const StructuredView: React.FC<StructuredViewProps> = ({
       <div className="p-4 border-b border-gray-100 flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-900">Structured Content</h2>
         <div className="flex gap-2">
-          <Button 
+          <Button
             onClick={onAnalyze}
             className="gap-2 bg-blue-600 text-white hover:bg-blue-700"
           >
             <FileSearch className="h-5 w-5" />
             Analyze Content
           </Button>
-          <Button 
+          <Button
             onClick={onAIScore}
             className="gap-2 bg-blue-600 text-white hover:bg-blue-700"
           >
@@ -37,15 +40,9 @@ const StructuredView: React.FC<StructuredViewProps> = ({
       </div>
 
       {/* Scrollable Content Section */}
-      <div className="flex-1 p-6 overflow-y-auto max-h-[70vh]">
-        <div 
-          className="prose max-w-none"
-          dangerouslySetInnerHTML={{ __html: content }} 
-        />
-      </div>
+      <MarkdownRenderer content={content} />
     </div>
   );
 };
-
 
 export default StructuredView;
